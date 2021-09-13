@@ -13,6 +13,6 @@ chrome.runtime.onInstalled.addListener(
 
 chrome.action.onClicked.addListener(
   (currentTab) => {
-    chrome.tabs.create({ url: `${URL_ROOT}/timing?source=${currentTab.url}` });
+    chrome.tabs.create({ url: `${URL_ROOT}/start?source=${currentTab.url}` });
   },
 );
