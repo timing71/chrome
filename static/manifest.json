@@ -6,6 +6,12 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://*.timing71.org/*", "http://localhost/*"],
+      "js": ["injector.js"]
+    }
+  ],
   "permissions": [
     "declarativeContent",
     "tabs"
@@ -18,5 +24,8 @@
     "32": "logo_32.png",
     "64": "logo_64.png",
     "128": "logo_128.png"
+  },
+  "externally_connectable": {
+    "matches": ["https://*.timing71.org/*", "http://localhost/*"]
   }
 }

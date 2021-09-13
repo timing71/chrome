@@ -17,6 +17,7 @@ process.env.BABEL_ENV = TARGET;
 const common = {
   entry: {
     background: path.join(PATHS.app, 'background.js'),
+    injector: path.join(PATHS.app, 'injector.js'),
   },
   resolve: {
     extensions: ['.js', '.jsx'],
