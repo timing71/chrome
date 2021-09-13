@@ -1,0 +1,15 @@
+{
+  "extends": "react-app",
+  "rules": {
+    "no-console": "warn",
+    "no-unused-expressions": "warn",
+    "object-curly-spacing": ["warn", "always"],
+    "semi": "warn",
+    "react/jsx-first-prop-new-line": ["warn", "multiline"],
+    "react/jsx-indent": ["warn", 2],
+    "react/jsx-indent-props": ["warn", 2],
+    "react/jsx-no-duplicate-props": "warn",
+    "react/jsx-sort-props": "warn",
+    "react/jsx-max-props-per-line": ["warn", { "maximum": 1 }]
+  }
+}
