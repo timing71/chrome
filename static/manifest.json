@@ -12,6 +12,7 @@
       "js": ["injector.js"]
     }
   ],
+  "host_permissions": ["https://*/"],
   "permissions": [
     "declarativeContent",
     "tabs"
