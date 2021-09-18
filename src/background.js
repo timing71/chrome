@@ -1,5 +1,4 @@
 /* global chrome */
-
 import { setupPageRules } from "./pageRules";
 import { fetchService, startService, terminateService, updateServiceState } from "./services";
 
@@ -68,6 +67,18 @@ chrome.runtime.onConnectExternal.addListener(
                 })
               )
             );
+            break;
+
+          case 'WEBSOCKET':
+            const ws = new WebSocket(`${message.url}`);
+            ws.onmessage = (msg) => {
+              otherPort.postMessage({
+                type: 'WEBSOCKET_MESSAGE',
+                data: msg.data,
+                tag: message.tag
+              });
+            };
+
             break;
 
           default:
