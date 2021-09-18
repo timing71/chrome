@@ -5,7 +5,8 @@ const db = new Dexie('timing71_services');
 const DEFAULT_STATE = {
   cars: [],
   session: {},
-  messages: []
+  messages: [],
+  manifest: {}
 };
 
 db.version(1).stores({
