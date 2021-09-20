@@ -5,6 +5,7 @@ import { fetchService, startService, terminateService, updateServiceState } from
 const URL_ROOT = process.env.NODE_ENV === 'production' ? 'https://beta.timing71.org' : 'http://localhost:3000';
 
 const openPorts = [];
+const openWebsockets = {};
 
 chrome.runtime.onInstalled.addListener(
   () => {
@@ -21,19 +22,26 @@ chrome.action.onClicked.addListener(
   },
 );
 
-const handlePortMessage = (message, otherPort) => {
+const handlePortMessage = (msg, otherPort) => {
+  const { message, messageIdx } = msg;
   switch(message.type) {
     case 'HANDSHAKE':
       otherPort.postMessage({
-        type: 'HANDSHAKE_RETURN'
+        message: {
+          type: 'HANDSHAKE_RETURN',
+        },
+        messageIdx
       });
       break;
 
     case 'START_SERVICE':
       startService(message.uuid, message.source).then(
         otherPort.postMessage({
-          type: 'START_SERVICE_RETURN',
-          originalMessage: message
+          message: {
+            type: 'START_SERVICE_RETURN',
+            originalMessage: message
+          },
+          messageIdx
         })
       );
       break;
@@ -45,8 +53,11 @@ const handlePortMessage = (message, otherPort) => {
     case 'FETCH_SERVICE':
       fetchService(message.uuid).then(
         ss => otherPort.postMessage({
-          type: 'FETCH_SERVICE_RETURN',
-          ...ss
+          message: {
+            type: 'FETCH_SERVICE_RETURN',
+            ...ss
+          },
+          messageIdx
         })
       );
       break;
@@ -59,30 +70,51 @@ const handlePortMessage = (message, otherPort) => {
       fetch(message.url).then(
         response => response.text().then(
           text => otherPort.postMessage({
-            type: 'FETCH_RETURN',
-            data: text,
-            originalMessage: message
+            message: {
+              type: 'FETCH_RETURN',
+              data: text,
+              originalMessage: message
+            },
+            messageIdx
           })
         )
       );
       break;
 
-    case 'WEBSOCKET':
-      const ws = new WebSocket(`${message.url}`);
+    case 'OPEN_WEBSOCKET':
+      if (!openWebsockets[message.tag]) {
+        const ws = new WebSocket(`${message.url}`);
 
-      ws.onmessage = (msg) => {
-        openPorts.forEach(
-          openPort =>
-            openPort.postMessage({
-              type: 'WEBSOCKET_MESSAGE',
-              data: msg.data,
-              tag: message.tag
-            }
-          )
-        );
-      };
+        ws.onmessage = (msg) => {
+          openPorts.forEach(
+            openPort =>
+              openPort.postMessage({
+                type: 'WEBSOCKET_MESSAGE',
+                data: msg.data,
+                tag: message.tag
+              }
+            )
+          );
+        };
+
+        ws.onclose = () => {
+          if (openWebsockets[message.tag]) {
+            delete openWebsockets[message.tag];
+            handlePortMessage(msg, otherPort); // and thus open a new one
+          }
+        };
+
+        openWebsockets[message.tag] = ws;
+      }
 
       break;
+
+      case 'WEBSOCKET_SEND':
+        if (openWebsockets[message.tag]) {
+          const ws = openWebsockets[message.tag];
+          ws.send(message.data);
+        }
+        break;
 
     default:
   }
