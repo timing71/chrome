@@ -85,6 +85,17 @@ const handlePortMessage = (msg, otherPort) => {
       if (!openWebsockets[message.tag]) {
         const ws = new WebSocket(`${message.url}`);
 
+        ws.onopen = () => {
+          openPorts.forEach(
+            openPort =>
+              openPort.postMessage({
+                type: 'WEBSOCKET_OPEN',
+                tag: message.tag
+              }
+            )
+          );
+        }
+
         ws.onmessage = (msg) => {
           openPorts.forEach(
             openPort =>
@@ -106,6 +117,12 @@ const handlePortMessage = (msg, otherPort) => {
 
         openWebsockets[message.tag] = ws;
       }
+      else {
+        otherPort.postMessage({
+          type: 'WEBSOCKET_OPEN',
+          tag: message.tag
+        });
+      }
 
       break;
 
@@ -113,6 +130,14 @@ const handlePortMessage = (msg, otherPort) => {
         if (openWebsockets[message.tag]) {
           const ws = openWebsockets[message.tag];
           ws.send(message.data);
+        }
+        break;
+
+      case 'WEBSOCKET_CLOSE':
+        if (openWebsockets[message.tag]) {
+          const ws = openWebsockets[message.tag];
+          delete openWebsockets[message.tag];
+          ws.close();
         }
         break;
 
