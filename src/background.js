@@ -1,11 +1,16 @@
 /* global chrome */
+import { createStartURL } from "./config";
 import { setupPageRules } from "./pageRules";
 import { fetchService, startService, terminateService, updateServiceState } from "./services";
 
-const URL_ROOT = process.env.NODE_ENV === 'production' ? 'https://beta.timing71.org' : 'http://localhost:3000';
-
 const openPorts = [];
 const openWebsockets = {};
+
+const launchTiming71 = (sourceURL) => {
+  chrome.tabs.create({ url: createStartURL(sourceURL) }).then(
+    tab => chrome.tabs.update(tab.id, { autoDiscardable: false })
+  );
+};
 
 chrome.runtime.onInstalled.addListener(
   () => {
@@ -16,10 +21,16 @@ chrome.runtime.onInstalled.addListener(
 
 chrome.action.onClicked.addListener(
   (currentTab) => {
-    chrome.tabs.create({ url: `${URL_ROOT}/start?source=${currentTab.url}` }).then(
-      tab => chrome.tabs.update(tab.id, { autoDiscardable: false })
-    );
+    launchTiming71(currentTab.url);
   },
+);
+
+chrome.runtime.onMessage.addListener(
+  (msg) => {
+    if (msg.type === 'LAUNCH_T71') {
+      launchTiming71(msg.source);
+    }
+  }
 );
 
 const handlePortMessage = (msg, otherPort) => {

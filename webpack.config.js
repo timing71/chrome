@@ -18,6 +18,7 @@ const common = {
   entry: {
     background: path.join(PATHS.app, 'background.js'),
     injector: path.join(PATHS.app, 'injector.js'),
+    flash: path.join(PATHS.app, 'flash.js'),
   },
   resolve: {
     extensions: ['.js', '.jsx'],

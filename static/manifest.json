@@ -10,6 +10,11 @@
     {
       "matches": ["https://*.timing71.org/*", "http://localhost/*"],
       "js": ["injector.js"]
+    },
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["flash.js"],
+      "css": ["timing71.css"]
     }
   ],
   "host_permissions": ["https://*/"],
@@ -28,5 +33,9 @@
   },
   "externally_connectable": {
     "matches": ["https://*.timing71.org/*", "http://localhost/*"]
-  }
+  },
+  "web_accessible_resources": [{
+    "resources": ["logo_32.png"],
+    "matches": ["*://*/*"]
+  }]
 }

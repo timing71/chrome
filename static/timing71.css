@@ -1,0 +1,55 @@
+@keyframes appear {
+  from {
+    transform: translateX(120%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+div#t71_flash {
+  position: fixed;
+  right: 6px;
+  top: 6px;
+  z-index: 99999;
+
+  border: 1px solid #59ffff;
+  border-radius: 0.25em;
+
+  background-color: black;
+
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  font-family: Play, Arial, sans-serif;
+  color: #59ffff;
+  font-size: 12pt;
+  line-height: 32px;
+
+  padding: 8px 16px;
+
+  animation: appear both 1s;
+  animation-delay: 1s;
+}
+
+div#t71_flash:hover {
+  color: black;
+  background-color: #59ffff;
+}
+
+div#t71_flash > img {
+  padding-right: 8px;
+}
+
+div#t71_flash span.close {
+  margin-left: 16px;
+  font-size: small;
+}
+
+div#t71_flash span.close:hover {
+  background-color: black;
+  color: #59ffff;
+}

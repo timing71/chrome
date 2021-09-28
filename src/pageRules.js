@@ -1,6 +1,6 @@
 /* global chrome */
 
-const SUPPORTED_URLS = [
+export const SUPPORTED_URLS = [
   'livetiming.alkamelsystems.com/[a-zA-Z0-9]+',
   'racecontrol.indycar.com',
   'live.lemanscup.com',
