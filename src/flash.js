@@ -41,9 +41,12 @@ const createFlash = () => {
   document.body.appendChild(flash);
 };
 
+// Ignore query part of URL
+const matchableLocation = `${window.location.origin}${window.location.pathname}`;
+
 for (var i=0; i < SUPPORTED_URLS.length; i++) {
   const pattern = SUPPORTED_URLS[i];
-  const match = window.location.href.search(pattern);
+  const match = matchableLocation.search(pattern);
   if (match >= 0) {
     createFlash();
     break;
