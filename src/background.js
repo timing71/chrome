@@ -7,8 +7,8 @@ const openPorts = [];
 const openWebsockets = {};
 
 const launchTiming71 = (sourceURL) => {
-  chrome.tabs.create({ url: createStartURL(sourceURL) }).then(
-    tab => chrome.tabs.update(tab.id, { autoDiscardable: false })
+  chrome.windows.create({ type: 'popup', url: createStartURL(sourceURL) }).then(
+    window => chrome.tabs.update(window.tabs[0].id, { autoDiscardable: false })
   );
 };
 
@@ -105,7 +105,7 @@ const handlePortMessage = (msg, otherPort) => {
               }
             )
           );
-        }
+        };
 
         ws.onmessage = (msg) => {
           openPorts.forEach(
