@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: '14'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build package
+        run: yarn run build:ci
+
+      - name: Get commit ID from git describe
+        run: echo "git_describe=$(git describe --always)" >> $GITHUB_ENV
+
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: timing71-chrome-plugin-${{env.git_describe}}.zip
+          path: build
