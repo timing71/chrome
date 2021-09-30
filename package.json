@@ -5,7 +5,7 @@
   "main": "background.js",
   "repository": "https://github.com/timing71/browser-plugin",
   "author": "James Muscat <jamesremuscat@gmail.com>",
-  "license": "GPL-3.0-or-later",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@babel/runtime": "^7.15.4",
     "dexie": "^3.0.3",
