@@ -6,6 +6,7 @@ export const SUPPORTED_URLS = [
   'live.lemanscup.com',
   'live.europeanlemansseries.com',
   'live.fiawec.com',
+  'livetiming.getraceresults.com/[a-zA-Z0-9]+'
 ];
 
 export const setupPageRules = () => {
