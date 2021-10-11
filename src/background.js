@@ -78,7 +78,7 @@ const handlePortMessage = (msg, otherPort) => {
       break;
 
     case 'FETCH':
-      fetch(message.url).then(
+      fetch(message.url, message.options).then(
         response => response.text().then(
           text => otherPort.postMessage({
             message: {
