@@ -73,8 +73,8 @@ const handlePortMessage = (msg, otherPort) => {
       );
       break;
 
-    case 'STORE_SERVICE_STATE':
-      updateServiceState(message.uuid, message.state);
+    case 'UPDATE_SERVICE_STATE':
+      updateServiceState(message.uuid, message.state, message.timestamp);
       break;
 
     case 'FETCH':
