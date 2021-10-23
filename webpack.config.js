@@ -92,9 +92,9 @@ if (TARGET === 'build' || TARGET === 'build:ci') {
     },
     output: {
       path: PATHS.build,
-      filename: '[name].[chunkhash].js',
-      chunkFilename: '[name].[chunkhash].js',
-      sourceMapFilename: '[name].[chunkhash].js.map',
+      filename: '[name].js',
+      chunkFilename: '[name].js',
+      sourceMapFilename: '[name].js.map',
     },
   });
 }
