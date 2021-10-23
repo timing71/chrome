@@ -16,8 +16,6 @@ const createFlash = () => {
 
   const img = document.createElement('img');
   img.src = chrome.runtime.getURL('logo_32.png');
-  img.style.width = '32px';
-  img.style.height = '32px';
   flash.appendChild(img);
 
   const text = document.createElement('span');

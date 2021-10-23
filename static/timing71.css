@@ -41,7 +41,9 @@ div#t71_flash:hover {
 }
 
 div#t71_flash > img {
-  padding-right: 8px;
+  margin-right: 8px;
+  width: 32px;
+  height: 32px;
 }
 
 div#t71_flash span.close {
