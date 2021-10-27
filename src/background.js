@@ -1,5 +1,5 @@
 /* global chrome */
-import { createStartURL } from "./config";
+import { createStartURL, getConfig } from "./config";
 import { setupPageRules } from "./pageRules";
 import { fetchService, startService, terminateService, updateServiceState } from "./services";
 
@@ -12,12 +12,17 @@ const launchTiming71 = (sourceURL) => {
   );
 };
 
-chrome.runtime.onInstalled.addListener(
-  () => {
-    chrome.action.disable();
-    setupPageRules();
-  },
-);
+const updateConfig = () => {
+  getConfig().then(
+    config => {
+      chrome.action.disable();
+      setupPageRules(config.supportedURLs);
+    }
+  );
+};
+
+chrome.runtime.onInstalled.addListener(updateConfig);
+chrome.runtime.onStartup.addListener(updateConfig);
 
 chrome.action.onClicked.addListener(
   (currentTab) => {
@@ -26,9 +31,20 @@ chrome.action.onClicked.addListener(
 );
 
 chrome.runtime.onMessage.addListener(
-  (msg) => {
-    if (msg.type === 'LAUNCH_T71') {
-      launchTiming71(msg.source);
+  (msg, _, sendResponse) => {
+    switch (msg.type) {
+
+      case 'LAUNCH_T71':
+        launchTiming71(msg.source);
+        break;
+
+      case 'GET_CONFIG':
+        getConfig().then(
+          config => sendResponse(config)
+        );
+        return true;
+
+      default:
     }
   }
 );

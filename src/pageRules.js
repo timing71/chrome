@@ -1,19 +1,10 @@
 /* global chrome */
 
-export const SUPPORTED_URLS = [
-  'livetiming.alkamelsystems.com/[a-zA-Z0-9]+',
-  'racecontrol.indycar.com',
-  'live.lemanscup.com',
-  'live.europeanlemansseries.com',
-  'live.fiawec.com',
-  'livetiming.getraceresults.com/[a-zA-Z0-9]+'
-];
-
-export const setupPageRules = () => {
+export const setupPageRules = (supportedURLs) => {
   chrome.declarativeContent.onPageChanged.removeRules(
     undefined,
     () => {
-      const rules = SUPPORTED_URLS.map(
+      const rules = supportedURLs.map(
         regex => ({
           conditions: [
             new chrome.declarativeContent.PageStateMatcher({
