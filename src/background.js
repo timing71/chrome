@@ -78,7 +78,7 @@ const handlePortMessage = (msg, otherPort) => {
       break;
 
     case 'FETCH_SERVICE':
-      fetchService(message.uuid).then(
+      fetchService(message.uuid, message.timestamp).then(
         ss => otherPort.postMessage({
           message: {
             type: 'FETCH_SERVICE_RETURN',
