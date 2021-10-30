@@ -41,12 +41,12 @@ export const terminateService = async (uuid) => {
   await db.service_states.delete(uuid);
 };
 
-export const fetchService = async (uuid) => {
+export const fetchService = async (uuid, timestamp=null) => {
   const service = await db.services.get(uuid);
   const state = await db.service_states
     .orderBy(['uuid+timestamp'])
     .reverse()
-    .filter(s => s.uuid === uuid)
+    .filter(s => s.uuid === uuid && s.timestamp <= (timestamp || Date.now()))
     .first();
   return {
     service,

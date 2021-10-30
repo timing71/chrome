@@ -87,7 +87,7 @@ const handlePortMessage = (msg, otherPort) => {
           messageIdx
         })
       );
-      break;
+      return true;
 
     case 'UPDATE_SERVICE_STATE':
       updateServiceState(message.uuid, message.state, message.timestamp);
@@ -106,7 +106,7 @@ const handlePortMessage = (msg, otherPort) => {
           })
         )
       );
-      break;
+      return true;
 
     case 'OPEN_WEBSOCKET':
       if (!openWebsockets[message.tag]) {
@@ -151,7 +151,7 @@ const handlePortMessage = (msg, otherPort) => {
         });
       }
 
-      break;
+      return true;
 
       case 'WEBSOCKET_SEND':
         if (openWebsockets[message.tag]) {
