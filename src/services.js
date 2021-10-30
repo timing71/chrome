@@ -44,10 +44,9 @@ export const terminateService = async (uuid) => {
 export const fetchService = async (uuid, timestamp=null) => {
   const service = await db.services.get(uuid);
   const state = await db.service_states
-    .orderBy(['uuid+timestamp'])
-    .reverse()
-    .filter(s => s.uuid === uuid && s.timestamp <= (timestamp || Date.now()))
-    .first();
+    .where('[uuid+timestamp]')
+    .between([uuid, Dexie.minKey], [uuid, timestamp || Dexie.maxKey], true, true)
+    .last();
   return {
     service,
     state: state.state
@@ -55,9 +54,10 @@ export const fetchService = async (uuid, timestamp=null) => {
 };
 
 export const updateServiceState = async (uuid, state, timestamp=null) => {
+  const myTimestamp = timestamp || Date.now();
   await db.service_states.put({
     uuid,
     state,
-    timestamp: timestamp || Date.now()
-  });
+    timestamp: myTimestamp
+  }, [uuid, myTimestamp]);
 };
