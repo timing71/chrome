@@ -61,6 +61,25 @@ const handlePortMessage = (msg, otherPort) => {
       });
       break;
 
+    case 'RETRIEVE_SETTINGS':
+      chrome.storage.sync.get(
+        null,
+        (settings) => {
+          otherPort.postMessage({
+            message: {
+              type: 'SETTINGS_RETRIEVED',
+              settings
+            },
+            messageIdx
+          });
+        }
+      );
+      return true;
+
+    case 'STORE_SETTINGS':
+      chrome.storage.sync.set(message.settings);
+      break;
+
     case 'START_SERVICE':
       startService(message.uuid, message.source).then(
         otherPort.postMessage({

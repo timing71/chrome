@@ -20,6 +20,7 @@
   "host_permissions": ["https://*/"],
   "permissions": [
     "declarativeContent",
+    "storage",
     "tabs"
   ],
   "action": {
