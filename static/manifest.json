@@ -19,6 +19,7 @@
   ],
   "host_permissions": ["https://*/"],
   "permissions": [
+    "alarms",
     "declarativeContent",
     "storage",
     "tabs"

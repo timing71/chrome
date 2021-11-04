@@ -23,6 +23,11 @@ db.version(2).stores({
   }
 );
 
+db.version(3).stores({
+  services: 'uuid,startTime',
+  service_states: '[uuid+timestamp], uuid, timestamp'
+});
+
 export const startService = async (uuid, source) => {
   await db.services.put({
     uuid,
@@ -41,12 +46,16 @@ export const terminateService = async (uuid) => {
   await db.service_states.delete(uuid);
 };
 
+const getServiceStateAt = (uuid, timestamp=null) => {
+  return db.service_states
+  .where('[uuid+timestamp]')
+  .between([uuid, Dexie.minKey], [uuid, timestamp || Dexie.maxKey], true, true)
+  .last();
+};
+
 export const fetchService = async (uuid, timestamp=null) => {
   const service = await db.services.get(uuid);
-  const state = await db.service_states
-    .where('[uuid+timestamp]')
-    .between([uuid, Dexie.minKey], [uuid, timestamp || Dexie.maxKey], true, true)
-    .last();
+  const state = await getServiceStateAt(uuid, timestamp);
   return {
     service,
     state: state.state
@@ -60,4 +69,30 @@ export const updateServiceState = async (uuid, state, timestamp=null) => {
     state,
     timestamp: myTimestamp
   }, [uuid, myTimestamp]);
+};
+
+export const purge = async () => {
+  const serviceCount = await db.services.count();
+  const statesCount = await db.service_states.count();
+  console.log(`Database contains ${serviceCount} service(s) and ${statesCount} states. Beginning purge...`); // eslint-disable-line no-console
+  // Delete all data for services whose state hasn't been updated in the last 24 hours
+  const threshold = Date.now() - (24 * 60 * 60 * 1000);
+  const candidateServices = await db.services.where('startTime').below(threshold).primaryKeys();
+
+  candidateServices.forEach(
+    uuid => {
+      getServiceStateAt(uuid).then(
+        latestState => {
+          const latestTimestamp = latestState?.timestamp;
+
+          if (!latestTimestamp || latestTimestamp < threshold) {
+            db.service_states.where('uuid').equals(uuid).delete();
+            db.services.delete(uuid);
+          }
+        }
+      ).catch(
+        e => console.error(e) // eslint-disable-line no-console
+      );
+    }
+  );
 };

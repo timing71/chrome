@@ -1,7 +1,7 @@
 /* global chrome */
 import { createStartURL, getConfig } from "./config";
 import { setupPageRules } from "./pageRules";
-import { fetchService, startService, terminateService, updateServiceState } from "./services";
+import { fetchService, purge, startService, terminateService, updateServiceState } from "./services";
 
 const openPorts = [];
 const openWebsockets = {};
@@ -23,6 +23,33 @@ const updateConfig = () => {
 
 chrome.runtime.onInstalled.addListener(updateConfig);
 chrome.runtime.onStartup.addListener(updateConfig);
+
+const PURGE_SERVICES_ALARM = 'purgeServices';
+
+const installAlarm = () => {
+  chrome.alarms.create(
+    PURGE_SERVICES_ALARM,
+    {
+      periodInMinutes: 60
+    }
+  );
+  purge();
+};
+
+chrome.runtime.onInstalled.addListener(installAlarm);
+chrome.runtime.onStartup.addListener(purge);
+
+chrome.alarms.onAlarm.addListener(
+  (alarm) => {
+    switch (alarm.name) {
+      case PURGE_SERVICES_ALARM:
+        purge();
+        break;
+      default:
+        // Nothing here
+    }
+  }
+);
 
 chrome.action.onClicked.addListener(
   (currentTab) => {
