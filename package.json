@@ -40,8 +40,8 @@
   },
   "scripts": {
     "clean": "rm -rf build dist",
-    "build": "webpack --progress",
+    "build": "yarn run clean && webpack --progress",
     "build:ci": "webpack",
-    "start": "webpack --watch"
+    "start": "yarn run clean && webpack --watch"
   }
 }
