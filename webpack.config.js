@@ -19,6 +19,7 @@ const common = {
     background: path.join(PATHS.app, 'background.js'),
     injector: path.join(PATHS.app, 'injector.js'),
     flash: path.join(PATHS.app, 'flash.js'),
+    host: path.join(PATHS.app, 'host.js')
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -49,7 +50,11 @@ const common = {
         { from: 'static' },
       ],
     }),
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      chunks: ['host'],
+      filename: 'host.html',
+      publicPath: './'
+    }),
   ],
 };
 

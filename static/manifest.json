@@ -36,8 +36,14 @@
   "externally_connectable": {
     "matches": ["https://*.timing71.org/*", "http://localhost/*"]
   },
-  "web_accessible_resources": [{
-    "resources": ["logo_32.png"],
-    "matches": ["*://*/*"]
-  }]
+  "web_accessible_resources": [
+    {
+      "resources": ["logo_32.png"],
+      "matches": ["*://*/*"]
+    },
+    {
+      "resources": ["host.html", "host.js"],
+      "matches": ["https://*.timing71.org/*", "http://localhost/*"]
+    }
+  ]
 }
