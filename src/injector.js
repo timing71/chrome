@@ -13,10 +13,12 @@ const createHostIframe = () => {
   iframe.src = chrome.runtime.getURL('host.html');
   iframe.style.display = 'none';
   iframe.id = 't71-host-frame';
-  document.body.appendChild(iframe);
+  return iframe;
 };
 
-createMeta('X-Timing71-Extension', chrome.runtime.id);
-createMeta('X-Timing71-Extension-Version', chrome.runtime.getManifest().version);
-
-createHostIframe();
+const iframe = createHostIframe();
+document.body.appendChild(iframe);
+iframe.onload = () => {
+  createMeta('X-Timing71-Extension', chrome.runtime.id);
+  createMeta('X-Timing71-Extension-Version', chrome.runtime.getManifest().version);
+};
