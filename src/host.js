@@ -74,16 +74,30 @@ const handleMessage = ({ data, origin }) => {
 
       case 'FETCH':
         fetch(message.url, message.options).then(
-          response => response.text().then(
-            text => send({
-              message: {
-                type: 'FETCH_RETURN',
-                data: text,
-                originalMessage: message
-              },
-              id
-            }, origin)
-          )
+          response => {
+            if (response.ok) {
+              response.text().then(
+                text => send({
+                  message: {
+                    type: 'FETCH_RETURN',
+                    data: text,
+                    originalMessage: message
+                  },
+                  id
+                }, origin)
+              );
+            }
+            else {
+              send({
+                message: {
+                  type: 'FETCH_RETURN',
+                  error: true,
+                  originalMessage: message
+                },
+                id
+              }, origin);
+            }
+          }
         );
         break;
 
@@ -115,7 +129,15 @@ const handleMessage = ({ data, origin }) => {
           ws.onclose = () => {
             if (_openWebsockets[message.tag]) {
               delete _openWebsockets[message.tag];
-              handleMessage({ data, origin }); // and thus open a new one
+              if (!!message.autoReconnect) {
+                handleMessage({ data, origin }); // and thus open a new one
+              }
+              else {
+                send({
+                  type: 'WEBSOCKET_CLOSE',
+                  tag: message.tag
+                }, origin);
+              }
             }
           };
 
