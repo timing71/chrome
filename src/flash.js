@@ -46,7 +46,6 @@ const matchableLocation = `${window.location.origin}${window.location.pathname}`
 
 getClientSideConfig().then(
   config => {
-    console.log(config)
     for (var i=0; i < (config.supportedURLs || []).length; i++) {
       const pattern = config.supportedURLs[i];
       const match = matchableLocation.search(pattern);
