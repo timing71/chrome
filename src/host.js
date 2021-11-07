@@ -1,5 +1,6 @@
 /* global chrome */
 
+import { generateReplay } from "./replay";
 import { fetchService, startService, updateServiceState } from "./services";
 
 const _openWebsockets = {};
@@ -70,6 +71,27 @@ const handleMessage = ({ data, origin }) => {
       case 'UPDATE_SERVICE_STATE':
         updateServiceState(message.uuid, message.state, message.timestamp);
         nullReply();
+        break;
+
+      case 'GENERATE_SERVICE_REPLAY':
+        generateReplay(message.uuid).then(
+          () => send(
+            {
+              message: {
+                type: 'REPLAY_GENERATION_FINISHED',
+                uuid: message.uuid
+              }
+            },
+            origin
+          )
+        );
+        send({
+          message: {
+            type: 'REPLAY_GENERATION_STARTED',
+            uuid: message.uuid
+          },
+          id
+        }, origin);
         break;
 
       case 'FETCH':

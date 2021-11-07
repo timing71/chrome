@@ -71,6 +71,13 @@ export const updateServiceState = async (uuid, state, timestamp=null) => {
   }, [uuid, myTimestamp]);
 };
 
+export const getAllServiceStates = async (uuid) => {
+  const states = await db.service_states
+    .where('[uuid+timestamp]')
+    .between([uuid, Dexie.minKey], [uuid, Dexie.maxKey], true, true).toArray();
+    return states;
+};
+
 export const purge = async () => {
   const serviceCount = await db.services.count();
   const statesCount = await db.service_states.count();
