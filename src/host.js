@@ -77,10 +77,8 @@ const handleMessage = ({ data, origin }) => {
         generateReplay(message.uuid).then(
           () => send(
             {
-              message: {
-                type: 'REPLAY_GENERATION_FINISHED',
-                uuid: message.uuid
-              }
+              type: 'REPLAY_GENERATION_FINISHED',
+              uuid: message.uuid
             },
             origin
           )
