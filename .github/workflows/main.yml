@@ -28,8 +28,16 @@ jobs:
       - name: Get commit ID from git describe
         run: echo "git_describe=$(git describe --always)" >> $GITHUB_ENV
 
-      - name: Upload ZIP
+      - name: Create extension ZIP
         uses: actions/upload-artifact@v2.2.4
         with:
           name: timing71-chrome-plugin-${{env.git_describe}}
-          path: build
+          path: |
+            build/*
+            !build/*.js.map
+
+      - name: Create JS sourcemaps
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: timing71-chrome-plugin-${{env.git_describe}}-sourcemaps
+          path: build/*.js.map
