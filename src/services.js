@@ -28,6 +28,10 @@ db.version(3).stores({
   service_states: '[uuid+timestamp], uuid, timestamp'
 });
 
+export const listServices = () => {
+  return db.services.toArray();
+};
+
 export const startService = async (uuid, source) => {
   await db.services.put({
     uuid,

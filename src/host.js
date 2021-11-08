@@ -1,7 +1,7 @@
 /* global chrome */
 
 import { generateReplay } from "./replay";
-import { fetchService, startService, updateServiceState } from "./services";
+import { fetchService, listServices, startService, updateServiceState } from "./services";
 
 const _openWebsockets = {};
 
@@ -39,6 +39,23 @@ const handleMessage = ({ data, origin }) => {
       case 'STORE_SETTINGS':
         chrome.storage.sync.set(message.settings);
         nullReply();
+        break;
+
+      case 'RETRIEVE_SERVICES_LIST':
+        listServices().then(
+          services => {
+            send(
+              {
+                message: {
+                  type: 'SERVICES_LIST',
+                  services
+                },
+                id
+              },
+              origin
+            );
+          }
+        );
         break;
 
       case 'START_SERVICE':
