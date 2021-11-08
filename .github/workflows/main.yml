@@ -31,5 +31,5 @@ jobs:
       - name: Upload ZIP
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: timing71-chrome-plugin-${{env.git_describe}}.zip
+          name: timing71-chrome-plugin-${{env.git_describe}}
           path: build
