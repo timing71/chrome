@@ -1,5 +1,7 @@
 /* global chrome */
 
+import { getClientSideConfig } from "./config";
+
 export const setupPageRules = (supportedURLs) => {
   chrome.declarativeContent.onPageChanged.removeRules(
     undefined,
@@ -19,4 +21,16 @@ export const setupPageRules = (supportedURLs) => {
       chrome.declarativeContent.onPageChanged.addRules(rules);
     }
   );
+};
+
+export const pageIsSupported = async (url) => {
+  const config = await getClientSideConfig();
+  for (var i=0; i < (config.supportedURLs || []).length; i++) {
+    const pattern = config.supportedURLs[i];
+    const match = url.search(pattern);
+    if (match >= 0) {
+      return true;
+    }
+  }
+  return false;
 };

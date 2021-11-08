@@ -1,6 +1,6 @@
 /* global chrome */
 
-import { getClientSideConfig } from "./config";
+import { pageIsSupported } from "./pageRules";
 
 const createFlash = () => {
 
@@ -44,15 +44,6 @@ const createFlash = () => {
 // Ignore query part of URL
 const matchableLocation = `${window.location.origin}${window.location.pathname}`;
 
-getClientSideConfig().then(
-  config => {
-    for (var i=0; i < (config.supportedURLs || []).length; i++) {
-      const pattern = config.supportedURLs[i];
-      const match = matchableLocation.search(pattern);
-      if (match >= 0) {
-        createFlash();
-        break;
-      }
-    }
-  }
+pageIsSupported(matchableLocation).then(
+  supported => supported && createFlash()
 );

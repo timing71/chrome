@@ -1,7 +1,10 @@
 /* global chrome */
-import { createStartURL, getConfig } from "./config";
-import { setupPageRules } from "./pageRules";
+import { createPageURL, createStartURL, getConfig } from "./config";
 import { purge } from "./services";
+
+const showT71Page = (page) => {
+  return chrome.windows.create({ type: 'popup', url: createPageURL(page) });
+};
 
 const launchTiming71 = (sourceURL) => {
   chrome.windows.create({ type: 'popup', url: createStartURL(sourceURL) }).then(
@@ -9,17 +12,8 @@ const launchTiming71 = (sourceURL) => {
   );
 };
 
-const updateConfig = () => {
-  getConfig().then(
-    config => {
-      chrome.action.disable();
-      setupPageRules(config.supportedURLs);
-    }
-  );
-};
-
-chrome.runtime.onInstalled.addListener(updateConfig);
-chrome.runtime.onStartup.addListener(updateConfig);
+chrome.runtime.onInstalled.addListener(getConfig);
+chrome.runtime.onStartup.addListener(getConfig);
 
 const PURGE_SERVICES_ALARM = 'purgeServices';
 
@@ -48,18 +42,16 @@ chrome.alarms.onAlarm.addListener(
   }
 );
 
-chrome.action.onClicked.addListener(
-  (currentTab) => {
-    launchTiming71(currentTab.url);
-  },
-);
-
 chrome.runtime.onMessage.addListener(
   (msg, _, sendResponse) => {
     switch (msg.type) {
 
       case 'LAUNCH_T71':
         launchTiming71(msg.source);
+        break;
+
+      case 'SHOW_T71_PAGE':
+        showT71Page(msg.page);
         break;
 
       case 'GET_CONFIG':

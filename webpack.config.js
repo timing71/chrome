@@ -17,9 +17,10 @@ process.env.BABEL_ENV = TARGET;
 const common = {
   entry: {
     background: path.join(PATHS.app, 'background.js'),
-    injector: path.join(PATHS.app, 'injector.js'),
     flash: path.join(PATHS.app, 'flash.js'),
-    host: path.join(PATHS.app, 'host.js')
+    host: path.join(PATHS.app, 'host.js'),
+    injector: path.join(PATHS.app, 'injector.js'),
+    menu: path.join(PATHS.app, 'menu.js'),
   },
   resolve: {
     extensions: ['.js', '.jsx'],

@@ -55,3 +55,56 @@ div#t71_flash span.close:hover {
   background-color: black;
   color: #59ffff;
 }
+
+html.t71-popup {
+  width: 20em;
+
+  background-color: black;
+  color: #59FFFF;
+}
+
+.t71-popup body {
+  font-family: 'Play', Verdana, Arial, sans-serif;
+  font-size: 12pt;
+  text-align: center;
+}
+
+.t71-popup h1 {
+  font-size: 14pt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.t71-popup h1 img {
+  margin-right: 0.5rem;
+}
+
+.t71-popup ul {
+  margin: 0.25em;
+  padding: 0;
+}
+
+.t71-popup li {
+  list-style: none;
+}
+
+.t71-popup button {
+  background-color: black;
+  color: #59FFFF;
+  border: 1px solid #59FFFF;
+  border-radius: 0.125em;
+
+  font-family: 'Play', Verdana, Arial, sans-serif;
+  font-size: medium;
+
+  width: 75vw;
+  padding: 0.5em;
+  margin-bottom: 1em;
+}
+
+.t71-popup button:hover, .t71-popup button:active {
+  background-color: #59FFFF;
+  color: black;
+  cursor: pointer;
+}

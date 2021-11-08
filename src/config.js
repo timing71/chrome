@@ -4,6 +4,8 @@ const URL_ROOT = process.env.NODE_ENV === 'production' ? 'https://beta.timing71.
 
 export const createStartURL = (source) => (`${URL_ROOT}/start?source=${source}`);
 
+export const createPageURL = (page) => (`${URL_ROOT}/${page}`);
+
 let _config = {};
 
 export const getConfig = async () => {
