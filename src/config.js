@@ -12,9 +12,11 @@ export const getConfig = async () => {
       const response = await fetch(`${URL_ROOT}/pluginConfig.json`);
       if (response.status === 200) {
         _config = await response.json();
+        chrome.storage.local.set({ 'config': _config });
       }
     }
     catch (e) {
+      _config = await chrome.storage.local.get(['config']);
     }
   }
 
