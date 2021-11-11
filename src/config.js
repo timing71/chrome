@@ -9,7 +9,7 @@ export const createPageURL = (page) => (`${URL_ROOT}/${page}`);
 let _config = {};
 
 export const getConfig = async () => {
-  if (Object.entries(_config).length === 0) {
+  if (!_config || Object.entries(_config).length === 0) {
     try {
       const response = await fetch(`${URL_ROOT}/pluginConfig.json`);
       if (response.status === 200) {
@@ -22,7 +22,7 @@ export const getConfig = async () => {
     }
   }
 
-  return Promise.resolve(_config);
+  return Promise.resolve(_config || {});
 };
 
 
