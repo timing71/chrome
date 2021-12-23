@@ -1,7 +1,7 @@
 /* global chrome */
 
 import { generateReplay } from "./replay";
-import { fetchService, listServices, startService, updateServiceState } from "./services";
+import { fetchService, listServices, startService, updateServiceAnalysis, updateServiceState } from "./services";
 
 const _openWebsockets = {};
 
@@ -87,6 +87,11 @@ const handleMessage = ({ data, origin }) => {
 
       case 'UPDATE_SERVICE_STATE':
         updateServiceState(message.uuid, message.state, message.timestamp);
+        nullReply();
+        break;
+
+      case 'UPDATE_SERVICE_ANALYSIS':
+        updateServiceAnalysis(message.uuid, message.analysis, message.timestamp);
         nullReply();
         break;
 

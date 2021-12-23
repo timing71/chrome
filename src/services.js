@@ -2,11 +2,17 @@ import Dexie from "dexie";
 
 const db = new Dexie('timing71_services');
 
-const DEFAULT_STATE = {
+const DEFAULT_SERVICE_STATE = {
   cars: [],
   session: {},
   messages: [],
   manifest: {}
+};
+
+const DEFAULT_ANALYSIS_STATE = {
+  cars: {},
+  messages: [],
+  session: {},
 };
 
 db.version(2).stores({
@@ -23,9 +29,10 @@ db.version(2).stores({
   }
 );
 
-db.version(3).stores({
+db.version(4).stores({
   services: 'uuid,startTime',
-  service_states: '[uuid+timestamp], uuid, timestamp'
+  service_states: '[uuid+timestamp], uuid, timestamp',
+  service_analyses: 'uuid'
 });
 
 export const listServices = () => {
@@ -33,21 +40,28 @@ export const listServices = () => {
 };
 
 export const startService = async (uuid, source) => {
+  const ts = Date.now();
   await db.services.put({
     uuid,
     source,
-    startTime: Date.now()
+    startTime: ts
   });
   await db.service_states.put({
     uuid,
-    state: { ...DEFAULT_STATE },
-    timestamp: Date.now()
+    state: { ...DEFAULT_SERVICE_STATE },
+    timestamp: ts
+  });
+  await db.service_analyses.put({
+    uuid,
+    state: {  ...DEFAULT_ANALYSIS_STATE },
+    timestamp: ts
   });
 };
 
 export const terminateService = async (uuid) => {
   await db.services.delete(uuid);
   await db.service_states.delete(uuid);
+  await db.service_analyses.delete(uuid);
 };
 
 const getServiceStateAt = (uuid, timestamp=null) => {
@@ -60,7 +74,9 @@ const getServiceStateAt = (uuid, timestamp=null) => {
 export const fetchService = async (uuid, timestamp=null) => {
   const service = await db.services.get(uuid);
   const state = await getServiceStateAt(uuid, timestamp);
+  const analysis = await db.service_analyses.get(uuid);
   return {
+    analysis,
     service,
     state: state.state
   };
@@ -74,6 +90,16 @@ export const updateServiceState = async (uuid, state, timestamp=null) => {
     timestamp: myTimestamp
   }, [uuid, myTimestamp]);
 };
+
+export const updateServiceAnalysis = async (uuid, state, timestamp=null) => {
+  const myTimestamp = timestamp || Date.now();
+  await db.service_analyses.put({
+    uuid,
+    state,
+    timestamp: myTimestamp
+  });
+};
+
 
 export const getAllServiceStates = async (uuid) => {
   const states = await db.service_states
@@ -98,6 +124,7 @@ export const purge = async () => {
 
           if (!latestTimestamp || latestTimestamp < threshold) {
             db.service_states.where('uuid').equals(uuid).delete();
+            db.service_analyses.delete(uuid);
             db.services.delete(uuid);
           }
         }
