@@ -211,6 +211,11 @@ const handleMessage = ({ data, origin }) => {
         nullReply();
         break;
 
+      case 'SHOW_T71_PAGE':
+        chrome.runtime.sendMessage(message);
+        nullReply();
+        break;
+
       default:
         console.log("Received unhandled message", data);  // eslint-disable-line no-console
 
