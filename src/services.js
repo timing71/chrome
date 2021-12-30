@@ -10,9 +10,7 @@ const DEFAULT_SERVICE_STATE = {
 };
 
 const DEFAULT_ANALYSIS_STATE = {
-  cars: {},
-  messages: [],
-  session: {},
+  version: 2
 };
 
 db.version(2).stores({
