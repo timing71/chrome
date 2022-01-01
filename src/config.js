@@ -18,7 +18,7 @@ export const getConfig = async () => {
       }
     }
     catch (e) {
-      _config = await chrome.storage.local.get(['config']);
+      _config = await chrome.storage.local.get(['config']).config;
     }
   }
 
