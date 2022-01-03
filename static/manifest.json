@@ -1,7 +1,7 @@
 {
   "name": "Timing71",
   "description": "Timing71 browser extension",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"

@@ -16,9 +16,13 @@ export const getConfig = async () => {
         _config = await response.json();
         chrome.storage.local.set({ 'config': _config });
       }
+      else {
+        throw response.status;
+      }
     }
     catch (e) {
-      _config = await chrome.storage.local.get(['config']).config;
+      const stored = await chrome.storage.local.get(['config']);
+      _config = stored.config;
     }
   }
 
