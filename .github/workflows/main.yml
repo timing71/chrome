@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [ master ]
+    tags:
+      - v*
   pull_request:
     branches: [ master ]
 
@@ -12,6 +14,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Check out git tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.4.1
