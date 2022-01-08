@@ -1,6 +1,6 @@
 /* global chrome */
 
-import { generateReplay } from "./replay";
+import { generateAnalysis, generateReplay } from "./replay";
 import { fetchService, listServices, startService, updateServiceAnalysis, updateServiceState } from "./services";
 
 const _openWebsockets = {};
@@ -108,6 +108,25 @@ const handleMessage = ({ data, origin }) => {
         send({
           message: {
             type: 'REPLAY_GENERATION_STARTED',
+            uuid: message.uuid
+          },
+          id
+        }, origin);
+        break;
+
+      case 'GENERATE_ANALYSIS_DOWNLOAD':
+        generateAnalysis(message.uuid).then(
+          () => send(
+            {
+              type: 'ANALYSIS_GENERATION_FINISHED',
+              uuid: message.uuid
+            },
+            origin
+          )
+        );
+        send({
+          message: {
+            type: 'ANALYSIS_GENERATION_STARTED',
             uuid: message.uuid
           },
           id
