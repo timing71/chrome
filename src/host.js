@@ -96,7 +96,14 @@ const handleMessage = ({ data, origin }) => {
         break;
 
       case 'GENERATE_SERVICE_REPLAY':
-        generateReplay(message.uuid).then(
+        const generationProgress = (progress) => {
+          send({
+            type: 'REPLAY_GENERATION_PROGRESS',
+            uuid: message.uuid,
+            progress
+          });
+        };
+        generateReplay(message.uuid, generationProgress).then(
           () => send(
             {
               type: 'REPLAY_GENERATION_FINISHED',

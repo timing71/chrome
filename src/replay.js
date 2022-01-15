@@ -1,37 +1,49 @@
 import { fetchService, getAllServiceStates } from "./services";
 
-const JSZip = require('jszip');
+const zip = require("@zip.js/zip.js");
 const FileSaver = require('file-saver');
 
 const filenameFromManifest = (manifest, extension) => `${manifest.name} - ${manifest.description}.${extension}`;
 
-export const generateReplay = async (serviceUUID) => {
-  const states = await getAllServiceStates(serviceUUID);
-  const zipfile = new JSZip();
+export const generateReplay = async (serviceUUID, onProgress) => {
+  let states = await getAllServiceStates(serviceUUID);
+  const stateCount = await states.count();
+  console.log(`Creating replay for ${serviceUUID} with ${stateCount} states`); //eslint-disable-line no-console
 
-  const finalState = states[states.length - 1];
+  const blobWriter = new zip.BlobWriter("application/zip");
+  const writer = new zip.ZipWriter(blobWriter);
+
+  const finalState = await states.last();
   const manifest =
   {
     ...finalState.state.manifest,
     version: 1
   };
-  zipfile.file(
+  await writer.add(
     'manifest.json',
-    JSON.stringify(manifest)
+    new zip.TextReader(JSON.stringify(manifest))
   );
 
-  states.forEach(
+  states = await getAllServiceStates(serviceUUID);
+
+  let idx = 0;
+
+  await states.each(
     ({ state, timestamp }) => {
       delete state.manifest;
       const filename = `${Math.floor(timestamp / 1000)}.json`.padStart(16, '0');
-      zipfile.file(
+
+      onProgress({ item: idx, total: stateCount, percent: Math.floor(100 * ++idx / stateCount) });
+
+      return writer.add(
         filename,
-        JSON.stringify(state)
+        new zip.TextReader(JSON.stringify(state))
       );
     }
   );
 
-  const blob = await zipfile.generateAsync({ type: 'blob' });
+  const blob = blobWriter.getData();
+
   FileSaver.saveAs(
     blob,
     filenameFromManifest(manifest, 'zip')

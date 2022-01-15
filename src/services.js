@@ -102,7 +102,7 @@ export const updateServiceAnalysis = async (uuid, state, timestamp=null) => {
 export const getAllServiceStates = async (uuid) => {
   const states = await db.service_states
     .where('[uuid+timestamp]')
-    .between([uuid, Dexie.minKey], [uuid, Dexie.maxKey], true, true).toArray();
+    .between([uuid, Dexie.minKey], [uuid, Dexie.maxKey], true, true);
     return states;
 };
 
