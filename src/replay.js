@@ -28,19 +28,34 @@ export const generateReplay = async (serviceUUID, onProgress) => {
 
   let idx = 0;
 
+  const promises = [];
+
   await states.each(
     ({ state, timestamp }) => {
       delete state.manifest;
       const filename = `${Math.floor(timestamp / 1000)}.json`.padStart(16, '0');
 
-      onProgress({ item: idx, total: stateCount, percent: Math.floor(100 * ++idx / stateCount) });
-
-      return writer.add(
+      const promise = writer.add(
         filename,
         new zip.TextReader(JSON.stringify(state))
+      ).then(
+        () => {
+          // Potential race condition here, but it's just progress feedback so might not be important...
+          onProgress({ item: idx++, total: stateCount, percent: Math.floor(100 * idx / stateCount) });
+        }
+      ).catch(
+        e => {
+          console.error(`Error adding state from timestamp ${timestamp}`, e); // eslint-disable-line no-console
+          return Promise.resolve();
+        }
       );
+      promises.push(promise);
     }
   );
+
+  await Promise.all(promises);
+
+  await writer.close();
 
   const blob = blobWriter.getData();
 
