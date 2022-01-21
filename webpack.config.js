@@ -101,5 +101,10 @@ if (TARGET === 'build' || TARGET === 'build:ci') {
       chunkFilename: '[name].js',
       sourceMapFilename: '[name].js.map',
     },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': '"production"',
+      })
+    ],
   });
 }

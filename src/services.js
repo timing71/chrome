@@ -114,21 +114,26 @@ export const purge = async () => {
   const threshold = Date.now() - (24 * 60 * 60 * 1000);
   const candidateServices = await db.services.where('startTime').below(threshold).primaryKeys();
 
-  candidateServices.forEach(
-    uuid => {
-      getServiceStateAt(uuid).then(
-        latestState => {
-          const latestTimestamp = latestState?.timestamp;
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`Purging is disabled as NODE_ENV is ${process.env.NODE_ENV}`); // eslint-disable-line no-console
+  }
+  else {
+    candidateServices.forEach(
+      uuid => {
+        getServiceStateAt(uuid).then(
+          latestState => {
+            const latestTimestamp = latestState?.timestamp;
 
-          if (!latestTimestamp || latestTimestamp < threshold) {
-            db.service_states.where('uuid').equals(uuid).delete();
-            db.service_analyses.delete(uuid);
-            db.services.delete(uuid);
+            if (!latestTimestamp || latestTimestamp < threshold) {
+              db.service_states.where('uuid').equals(uuid).delete();
+              db.service_analyses.delete(uuid);
+              db.services.delete(uuid);
+            }
           }
-        }
-      ).catch(
-        e => console.error(e) // eslint-disable-line no-console
-      );
-    }
-  );
+        ).catch(
+          e => console.error(e) // eslint-disable-line no-console
+        );
+      }
+    );
+  }
 };
