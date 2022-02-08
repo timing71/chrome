@@ -166,6 +166,18 @@ const handleMessage = ({ data, origin }) => {
               }, origin);
             }
           }
+        ).catch(
+          e => send(
+            {
+              message: {
+                type: 'FETCH_FAILED',
+                error: e,
+                originalMessage: message
+              },
+              id
+            },
+            origin
+          )
         );
         break;
 
