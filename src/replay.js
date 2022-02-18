@@ -69,7 +69,7 @@ export const generateReplay = async (serviceUUID, onProgress) => {
 export const generateAnalysis = async (serviceUUID) => {
   const { analysis, state } = await fetchService(serviceUUID);
 
-  const json = JSON.stringify(analysis);
+  const json = JSON.stringify(analysis.state);
   const blob = new Blob([json], { type: 'application.json;charset=utf-8' });
   FileSaver.saveAs(
     blob,
