@@ -23,6 +23,13 @@ const createFlash = () => {
 
   flash.appendChild(text);
 
+  if (process.env.NODE_ENV === 'development') {
+    const mode = document.createElement('span');
+    mode.className = 'mode';
+    mode.appendChild(document.createTextNode('[DEV]'));
+    flash.appendChild(mode);
+  }
+
   const close = document.createElement('span');
   close.className = 'close';
   close.appendChild(document.createTextNode('[x]'));
