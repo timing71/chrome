@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Cookie", "operation": "set", "value": "GCLB=COrh-vjapKu1tAE" },
+        { "header": "X-t71-plugin", "operation": "set", "value": "true" }
+      ]
+    },
+    "condition": { "urlFilter": "wss://livetiming.formula1.com/signalr/connect", "resourceTypes": ["websocket"] }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Cookie", "operation": "set", "value": "GCLB=COrh-vjapKu1tAE" },
+        { "header": "X-t71-plugin", "operation": "set", "value": "true" }
+      ]
+    },
+    "condition": { "urlFilter": "livetiming.formula1.com/signalr", "resourceTypes": ["xmlhttprequest"] }
+  }
+]
