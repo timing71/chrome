@@ -145,14 +145,17 @@ const handleMessage = ({ data, origin }) => {
           response => {
             if (response.ok) {
               response.text().then(
-                text => send({
-                  message: {
-                    type: 'FETCH_RETURN',
-                    data: text,
-                    originalMessage: message
-                  },
-                  id
-                }, origin)
+                text => {
+                  send({
+                    message: {
+                      type: 'FETCH_RETURN',
+                      data: text,
+                      headers: objectFromEntries(response.headers.entries()),
+                      originalMessage: message
+                    },
+                    id
+                  }, origin);
+                }
               );
             }
             else {
@@ -267,3 +270,13 @@ document.addEventListener(
     window.addEventListener('message', handleMessage);
   }
 );
+
+function objectFromEntries(entries) {
+  const obj = {};
+
+  for (let pair of entries) {
+    obj[pair[0]] = pair[1];
+  }
+
+  return obj;
+}
