@@ -2,7 +2,7 @@
 
 import { pageIsSupported } from "./pageRules";
 
-const createFlash = () => {
+const createFlash = (sourceLocation) => {
 
   // Make sure Play font is available
   const play = document.createElement('link');
@@ -42,15 +42,59 @@ const createFlash = () => {
   flash.appendChild(close);
 
   flash.onclick = () => {
-    chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: window.location.href });
+    chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: sourceLocation });
   };
 
   document.body.appendChild(flash);
+};
+
+const checkIframes = async () => {
+  const iframes = document.getElementsByTagName('iframe');
+  for (let i = 0; i < iframes.length; i++) {
+    const iframe = iframes[i];
+    const frameSupported = await pageIsSupported(iframe.src);
+    if (frameSupported) {
+      createFlash(iframe.src);
+      return true;
+    }
+  }
+  return false;
 };
 
 // Ignore query part of URL
 const matchableLocation = `${window.location.origin}${window.location.pathname}`;
 
 pageIsSupported(matchableLocation).then(
-  supported => supported && createFlash()
+  async (supported) => {
+    if (supported) {
+      createFlash(window.location.href);
+    }
+    else {
+      const hasIframeNow = await checkIframes();
+
+      if (!hasIframeNow) {
+        const callback = (mutations) => {
+          [...mutations].forEach(
+            m => {
+              [...m.addedNodes].forEach(
+                async n => {
+                  if (n.tagName === 'IFRAME') {
+                    const supported = await pageIsSupported(n.src);
+                    if (supported) {
+                      observer.disconnect();
+                      createFlash(n.src);
+                    }
+                  }
+                }
+              );
+            }
+          );
+        };
+
+        const observer = new MutationObserver(callback);
+        observer.observe(document, { childList: true, subtree: true });
+      }
+
+    }
+  }
 );
