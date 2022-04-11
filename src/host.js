@@ -1,7 +1,7 @@
 /* global chrome */
 
 import { generateAnalysis, generateReplay } from "./replay";
-import { fetchService, listServices, startService, updateServiceAnalysis, updateServiceState } from "./services";
+import { deleteService, fetchService, listServices, startService, updateServiceAnalysis, updateServiceState } from "./services";
 
 const _openWebsockets = {};
 
@@ -138,6 +138,12 @@ const handleMessage = ({ data, origin }) => {
           },
           id
         }, origin);
+        break;
+
+      case 'DELETE_SERVICE':
+        deleteService(message.uuid).then(
+          nullReply()
+        );
         break;
 
       case 'FETCH':

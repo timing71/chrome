@@ -106,6 +106,14 @@ export const getAllServiceStates = async (uuid) => {
     return states;
 };
 
+export const deleteService = (uuid) => {
+  return Promise.all([
+    db.service_states.where('uuid').equals(uuid).delete(),
+    db.service_analyses.delete(uuid),
+    db.services.delete(uuid)
+  ]);
+};
+
 export const purge = async () => {
   const serviceCount = await db.services.count();
   const statesCount = await db.service_states.count();
@@ -125,9 +133,7 @@ export const purge = async () => {
             const latestTimestamp = latestState?.timestamp;
 
             if (!latestTimestamp || latestTimestamp < threshold) {
-              db.service_states.where('uuid').equals(uuid).delete();
-              db.service_analyses.delete(uuid);
-              db.services.delete(uuid);
+              deleteService(uuid);
             }
           }
         ).catch(
