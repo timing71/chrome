@@ -1,6 +1,6 @@
 {
   "name": "@timing71/browser-plugin",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Timing71 Browser Plugin",
   "main": "background.js",
   "repository": "https://github.com/timing71/beta-chrome",
