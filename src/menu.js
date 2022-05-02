@@ -1,6 +1,6 @@
 /* global chrome */
 
-const { pageIsSupported } = require("./pageRules");
+import { pageIsSupported } from "./pageRules";
 
 const showT71Page = (page) => {
   chrome.runtime.sendMessage({ type: 'SHOW_T71_PAGE', page });
