@@ -1,5 +1,6 @@
 /* global chrome */
 
+import { getConfig } from "./config";
 import { pageIsSupported } from "./pageRules";
 
 const showT71Page = (page) => {
@@ -8,6 +9,18 @@ const showT71Page = (page) => {
 
 const launchT71 = (url) => {
   chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: url });
+};
+
+const updateAndShowConfigVersion = () => {
+  const configVersionElem = document.getElementById('config-version');
+  configVersionElem.innerText = '...';
+  configVersionElem.classList.add('loading');
+  getConfig().then(
+    config => {
+      configVersionElem.innerText = config.version;
+      configVersionElem.classList.remove('loading');
+    }
+  );
 };
 
 document.addEventListener(
@@ -31,5 +44,12 @@ document.addEventListener(
         clickyThing.onclick = () => showT71Page(clickyThing.dataset.t71Page);
       }
     );
+
+    const pluginVersion = chrome.runtime.getManifest().version;
+    document.getElementById('plugin-version').innerText = pluginVersion;
+
+    const configVersionElem = document.getElementById('config-version');
+    configVersionElem.onclick = updateAndShowConfigVersion;
+    updateAndShowConfigVersion();
   }
 );

@@ -108,3 +108,30 @@ html.t71-popup {
   color: black;
   cursor: pointer;
 }
+
+.t71-popup hr {
+  border-color: #59FFFF;
+}
+
+.t71-popup .menu-footer {
+  display: flex;
+  justify-content: space-around;
+}
+
+@keyframes blinky {
+  from {
+    color: #59FFFF;
+  }
+  to {
+    color: #D3D3D3;
+  }
+}
+
+.t71-popup #config-version {
+  cursor: pointer;
+}
+
+.t71-popup #config-version.loading {
+  animation: blinky ease-in-out 1s infinite;
+  cursor: wait;
+}
