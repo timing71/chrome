@@ -61,10 +61,7 @@ const checkIframes = async () => {
   return false;
 };
 
-// Ignore query part of URL
-const matchableLocation = `${window.location.origin}${window.location.pathname}`;
-
-pageIsSupported(matchableLocation).then(
+pageIsSupported(window.location.href).then(
   async (supported) => {
     if (supported) {
       createFlash(window.location.href);

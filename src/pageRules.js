@@ -24,6 +24,9 @@ export const setupPageRules = (supportedURLs) => {
 };
 
 export const pageIsSupported = async (url) => {
+  if (url.search(/timing71\.org|localhost/) >= 0) {
+    return false;
+  }
   const config = await getClientSideConfig();
   for (var i=0; i < (config.supportedURLs || []).length; i++) {
     const pattern = config.supportedURLs[i];
