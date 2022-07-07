@@ -42,5 +42,6 @@
     "build": "yarn run clean && webpack --progress",
     "build:ci": "webpack",
     "start": "yarn run clean && webpack --watch"
-  }
+  },
+  "browserslist": "last 3 Chrome versions"
 }

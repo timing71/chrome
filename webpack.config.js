@@ -39,7 +39,11 @@ const common = {
       {
         test: /\.jsx?$/,
         use: {
-          loader: 'babel-loader?cacheDirectory',
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: TARGET === 'start',
+            compact: TARGET === 'build'
+          }
         },
         include: PATHS.app,
       },
