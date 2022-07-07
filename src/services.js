@@ -76,7 +76,7 @@ export const fetchService = async (uuid, timestamp=null) => {
   return {
     analysis,
     service,
-    state: state.state
+    state: state?.state
   };
 };
 
