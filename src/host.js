@@ -5,6 +5,9 @@ import { deleteService, fetchService, listServices, startService, updateServiceA
 
 const _openWebsockets = {};
 
+const _insecureFetches = {};
+let _insecureFetchIndex = 0;
+
 const send = (data, origin='*') => {
   window.parent.postMessage(
     data, origin
@@ -147,47 +150,58 @@ const handleMessage = ({ data, origin }) => {
         break;
 
       case 'FETCH':
-        fetch(message.url, message.options).then(
-          response => {
-            if (response.ok) {
-              response.text().then(
-                text => {
-                  send({
-                    message: {
-                      type: 'FETCH_RETURN',
-                      data: text,
-                      headers: objectFromEntries(response.headers.entries()),
-                      originalMessage: message
-                    },
-                    id
-                  }, origin);
-                }
-              );
-            }
-            else {
-              send({
-                message: {
-                  type: 'FETCH_RETURN',
-                  error: true,
-                  originalMessage: message
-                },
-                id
-              }, origin);
-            }
-          }
-        ).catch(
-          e => send(
-            {
-              message: {
-                type: 'FETCH_FAILED',
-                error: e,
-                originalMessage: message
-              },
-              id
+        const handleResponse = response => {
+          send({
+            message: {
+              type: 'FETCH_RETURN',
+              data: response,
+              headers: response.headers && objectFromEntries(response.headers.entries()),
+              originalMessage: message
             },
-            origin
-          )
+            id
+          }, origin);
+        };
+
+        const handleError =  e => send(
+          {
+            message: {
+              type: 'FETCH_FAILED',
+              error: e,
+              originalMessage: message
+            },
+            id
+          },
+          origin
         );
+
+        if (message.url.startsWith('http://')) {
+          // Insecure - route request through extension context
+          const myIndex = _insecureFetchIndex++;
+          _insecureFetches[myIndex] = [handleResponse, handleError];
+          chrome.runtime.sendMessage(
+            {
+              type: 'INSECURE_FETCH',
+              url: message.url,
+              options: message.options,
+              index: myIndex
+            },
+            handleResponse
+          );
+        }
+        else {
+          fetch(message.url, message.options).then(
+            r => {
+              if (r.ok) {
+                r.text().then(handleResponse);
+              }
+              else {
+                handleError(r.error);
+              }
+            }
+          ).catch(
+            handleError
+          );
+        }
         break;
 
       case 'OPEN_WEBSOCKET':

@@ -60,6 +60,14 @@ chrome.runtime.onMessage.addListener(
         );
         return true;
 
+      case 'INSECURE_FETCH':
+        fetch(msg.url, msg.options).then(
+          r => {
+            r.text().then(sendResponse);
+          }
+        );
+        return true;
+
       default:
     }
   }
