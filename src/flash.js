@@ -53,7 +53,7 @@ const checkIframes = async () => {
   for (let i = 0; i < iframes.length; i++) {
     const iframe = iframes[i];
     const frameSupported = await pageIsSupported(iframe.src);
-    if (frameSupported) {
+    if (frameSupported && !document.getElementById('t71_flash')) {
       createFlash(iframe.src);
       return true;
     }
@@ -70,22 +70,11 @@ pageIsSupported(window.location.href).then(
       const hasIframeNow = await checkIframes();
 
       if (!hasIframeNow) {
-        const callback = (mutations) => {
-          [...mutations].forEach(
-            m => {
-              [...m.addedNodes].forEach(
-                async n => {
-                  if (n.tagName === 'IFRAME') {
-                    const supported = await pageIsSupported(n.src);
-                    if (supported) {
-                      observer.disconnect();
-                      createFlash(n.src);
-                    }
-                  }
-                }
-              );
-            }
-          );
+        const callback = async (_, observer) => {
+          const anySupportedIframes = await checkIframes();
+          if (anySupportedIframes) {
+            observer.disconnect();
+          }
         };
 
         const observer = new MutationObserver(callback);
