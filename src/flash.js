@@ -70,15 +70,47 @@ pageIsSupported(window.location.href).then(
       const hasIframeNow = await checkIframes();
 
       if (!hasIframeNow) {
-        const callback = async (_, observer) => {
-          const anySupportedIframes = await checkIframes();
-          if (anySupportedIframes) {
-            observer.disconnect();
-          }
+        const callback = (mutations, observer) => {
+          [...mutations].forEach(
+            async m => {
+              [...m.addedNodes].forEach(
+                async n => {
+                  if (n.tagName === 'IFRAME') {
+                    const supported = await pageIsSupported(n.src);
+                    if (supported) {
+                      observer.disconnect();
+                      createFlash(n.src);
+                    }
+                  }
+                  else {
+                    const addedIframes = n.getElementsByTagName ? n.getElementsByTagName('iframe') : [];
+
+                    for (let idx = 0; idx < addedIframes.length; idx++) {
+                      const i = addedIframes[idx];
+                      const supported = await pageIsSupported(i.src);
+                      if (supported) {
+                        observer.disconnect();
+                        createFlash(n.src);
+                        break;
+                      }
+                    }
+
+                  }
+                }
+              );
+              if (m.type === 'attributes' && m.target?.tagName === 'IFRAME') {
+                const supported = await pageIsSupported(m.target.src);
+                if (supported) {
+                  observer.disconnect();
+                  createFlash(m.target.src);
+                }
+              }
+            }
+          );
         };
 
         const observer = new MutationObserver(callback);
-        observer.observe(document, { childList: true, subtree: true });
+        observer.observe(document, { attributes: true, childList: true, subtree: true });
       }
 
     }
