@@ -1,5 +1,6 @@
 /* global chrome */
 
+import { objectFromEntries } from "./config";
 import { generateAnalysis, generateReplay } from "./replay";
 import { deleteService, fetchService, listServices, startService, updateServiceAnalysis, updateServiceState } from "./services";
 
@@ -150,12 +151,12 @@ const handleMessage = ({ data, origin }) => {
         break;
 
       case 'FETCH':
-        const handleResponse = response => {
+        const handleResponse = (response, headers) => {
           send({
             message: {
               type: 'FETCH_RETURN',
               data: response,
-              headers: response.headers && objectFromEntries(response.headers.entries()),
+              headers: headers,
               originalMessage: message
             },
             id
@@ -192,7 +193,9 @@ const handleMessage = ({ data, origin }) => {
           fetch(message.url, message.options).then(
             r => {
               if (r.ok) {
-                r.text().then(handleResponse);
+                r.text().then(
+                  t => handleResponse(t, r.headers && objectFromEntries(r.headers.entries()))
+                );
               }
               else {
                 handleError(r.error);
@@ -290,13 +293,3 @@ document.addEventListener(
     window.addEventListener('message', handleMessage);
   }
 );
-
-function objectFromEntries(entries) {
-  const obj = {};
-
-  for (let pair of entries) {
-    obj[pair[0]] = pair[1];
-  }
-
-  return obj;
-}

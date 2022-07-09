@@ -37,3 +37,13 @@ export const getClientSideConfig = () => {
     }
   );
 };
+
+export function objectFromEntries(entries) {
+  const obj = {};
+
+  for (let pair of entries) {
+    obj[pair[0]] = pair[1];
+  }
+
+  return obj;
+}

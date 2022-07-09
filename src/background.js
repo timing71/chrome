@@ -1,5 +1,5 @@
 /* global chrome */
-import { createPageURL, createStartURL, getConfig } from "./config";
+import { createPageURL, createStartURL, getConfig, objectFromEntries } from "./config";
 import { purge } from "./services";
 
 const showT71Page = (page) => {
@@ -63,7 +63,9 @@ chrome.runtime.onMessage.addListener(
       case 'INSECURE_FETCH':
         fetch(msg.url, msg.options).then(
           r => {
-            r.text().then(sendResponse);
+            r.text().then(
+              t => sendResponse(t, r.headers && objectFromEntries(r.headers.entries()))
+            );
           }
         );
         return true;
