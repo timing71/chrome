@@ -117,8 +117,8 @@ export const purge = async () => {
   const serviceCount = await db.services.count();
   const statesCount = await db.service_states.count();
   console.log(`Database contains ${serviceCount} service(s) and ${statesCount} states. Beginning purge...`); // eslint-disable-line no-console
-  // Delete all data for services whose state hasn't been updated in the last 24 hours
-  const threshold = Date.now() - (24 * 60 * 60 * 1000);
+  // Delete all data for services whose state hasn't been updated in the last 7 days
+  const threshold = Date.now() - (7 * 24 * 60 * 60 * 1000);
   const candidateServices = await db.services.where('startTime').below(threshold).primaryKeys();
 
   if (process.env.NODE_ENV !== 'production') {
