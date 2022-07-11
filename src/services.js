@@ -2,13 +2,6 @@ import Dexie from "dexie";
 
 const db = new Dexie('timing71_services');
 
-const DEFAULT_SERVICE_STATE = {
-  cars: [],
-  session: {},
-  messages: [],
-  manifest: {}
-};
-
 const DEFAULT_ANALYSIS_STATE = {
   version: 2
 };
@@ -43,11 +36,6 @@ export const startService = async (uuid, source) => {
     uuid,
     source,
     startTime: ts
-  });
-  await db.service_states.put({
-    uuid,
-    state: { ...DEFAULT_SERVICE_STATE },
-    timestamp: ts
   });
   await db.service_analyses.put({
     uuid,
