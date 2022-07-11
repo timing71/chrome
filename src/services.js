@@ -26,8 +26,19 @@ db.version(4).stores({
   service_analyses: 'uuid'
 });
 
-export const listServices = () => {
-  return db.services.toArray();
+export const listServices = async () => {
+  const services = await db.services.toArray();
+
+  await Promise.all(
+    services.map(
+      async s => {
+        const state = await getServiceStateAt(s.uuid);
+        s.state = state?.state;
+      }
+    )
+  );
+
+  return services;
 };
 
 export const startService = async (uuid, source) => {
