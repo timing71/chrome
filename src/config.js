@@ -1,10 +1,13 @@
 /* global chrome */
 
-const URL_ROOT = process.env.NODE_ENV === 'production' ? 'https://beta.timing71.org' : 'http://localhost:3000';
+const DEV_URL_ROOT =  'http://localhost:3000';
+const PROD_URL_ROOT = 'https://beta.timing71.org';
 
-export const createStartURL = (source) => (`${URL_ROOT}/start?source=${encodeURIComponent(source)}`);
+const URL_ROOT = process.env.NODE_ENV === 'production' ? PROD_URL_ROOT : DEV_URL_ROOT;
 
-export const createPageURL = (page) => (`${URL_ROOT}/${page}`);
+export const createStartURL = (source, devMode=false) => (`${devMode ? DEV_URL_ROOT : PROD_URL_ROOT}/start?source=${encodeURIComponent(source)}`);
+
+export const createPageURL = (page, devMode=false) => (`${devMode ? DEV_URL_ROOT : PROD_URL_ROOT}/${page}`);
 
 let _config = {};
 

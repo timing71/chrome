@@ -2,12 +2,12 @@
 import { createPageURL, createStartURL, getConfig, objectFromEntries } from "./config";
 import { purge } from "./services";
 
-const showT71Page = (page) => {
-  return chrome.windows.create({ type: 'popup', url: createPageURL(page) });
+const showT71Page = (page, devMode) => {
+  return chrome.windows.create({ type: 'popup', url: createPageURL(page, devMode) });
 };
 
-const launchTiming71 = (sourceURL) => {
-  chrome.windows.create({ type: 'popup', url: createStartURL(sourceURL) }).then(
+const launchTiming71 = (sourceURL, devMode) => {
+  chrome.windows.create({ type: 'popup', url: createStartURL(sourceURL, devMode) }).then(
     window => chrome.tabs.update(window.tabs[0].id, { autoDiscardable: false })
   );
 };
@@ -47,11 +47,11 @@ chrome.runtime.onMessage.addListener(
     switch (msg.type) {
 
       case 'LAUNCH_T71':
-        launchTiming71(msg.source);
+        launchTiming71(msg.source, msg.devMode);
         break;
 
       case 'SHOW_T71_PAGE':
-        showT71Page(msg.page);
+        showT71Page(msg.page, msg.devMode);
         break;
 
       case 'GET_CONFIG':
