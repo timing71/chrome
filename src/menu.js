@@ -15,7 +15,7 @@ const updateAndShowConfigVersion = () => {
   const configVersionElem = document.getElementById('config-version');
   configVersionElem.innerText = '...';
   configVersionElem.classList.add('loading');
-  getConfig().then(
+  getConfig(true).then(
     config => {
       configVersionElem.innerText = config.version;
       configVersionElem.classList.remove('loading');

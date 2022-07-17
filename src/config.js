@@ -11,8 +11,8 @@ export const createPageURL = (page, devMode=false) => (`${devMode ? DEV_URL_ROOT
 
 let _config = {};
 
-export const getConfig = async () => {
-  if (!_config || Object.entries(_config).length === 0) {
+export const getConfig = async (forceReload=false) => {
+  if (!_config || Object.entries(_config).length === 0 || forceReload) {
     try {
       const response = await fetch(`${URL_ROOT}/pluginConfig.json`);
       if (response.status === 200) {
