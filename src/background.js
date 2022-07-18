@@ -67,6 +67,11 @@ chrome.runtime.onMessage.addListener(
               t => sendResponse(t, r.headers && objectFromEntries(r.headers.entries()))
             );
           }
+        ).catch(
+          (e) => {
+            // We can't pass the exception object through serialisation
+            sendResponse({ error: e.message, originalMessage: msg });
+          }
         );
         return true;
 

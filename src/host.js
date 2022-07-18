@@ -186,7 +186,7 @@ const handleMessage = ({ data, origin }) => {
               options: message.options,
               index: myIndex
             },
-            handleResponse
+            (response) => response.error ? handleError(response.error) : handleResponse(response)
           );
         }
         else {
