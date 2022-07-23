@@ -4,11 +4,11 @@ import { getConfig } from "./config";
 import { pageIsSupported } from "./pageRules";
 
 const showT71Page = (page) => {
-  chrome.runtime.sendMessage({ type: 'SHOW_T71_PAGE', page });
+  chrome.runtime.sendMessage({ type: 'SHOW_T71_PAGE', page, devMode: process.env.NODE_ENV === 'development' });
 };
 
 const launchT71 = (url) => {
-  chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: url });
+  chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: url, devMode: process.env.NODE_ENV === 'development' });
 };
 
 const updateAndShowConfigVersion = () => {

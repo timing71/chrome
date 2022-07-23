@@ -42,7 +42,11 @@ const createFlash = (sourceLocation) => {
   flash.appendChild(close);
 
   flash.onclick = () => {
-    chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: sourceLocation });
+    chrome.runtime.sendMessage({
+      type: 'LAUNCH_T71',
+      source: sourceLocation,
+      devMode: process.env.NODE_ENV === 'development'
+    });
   };
 
   document.body.appendChild(flash);
