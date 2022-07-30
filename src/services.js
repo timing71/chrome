@@ -41,6 +41,11 @@ export const listServices = async () => {
   return services;
 };
 
+export const listServiceSources = async () => {
+  const services = await db.services.orderBy('startTime').reverse().toArray();
+  return [...new Set(services.map(s => s.source))];
+};
+
 export const startService = async (uuid, source) => {
   const ts = Date.now();
   await db.services.put({

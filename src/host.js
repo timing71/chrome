@@ -2,7 +2,7 @@
 
 import { objectFromEntries } from "./config";
 import { generateAnalysis, generateReplay } from "./replay";
-import { deleteService, fetchService, listServices, startService, updateServiceAnalysis, updateServiceState } from "./services";
+import { deleteService, fetchService, listServices, listServiceSources, startService, updateServiceAnalysis, updateServiceState } from "./services";
 
 const _openWebsockets = {};
 
@@ -53,6 +53,23 @@ const handleMessage = ({ data, origin }) => {
                 message: {
                   type: 'SERVICES_LIST',
                   services
+                },
+                id
+              },
+              origin
+            );
+          }
+        );
+        break;
+
+      case 'RETRIEVE_SOURCES_LIST':
+        listServiceSources().then(
+          sources => {
+            send(
+              {
+                message: {
+                  type: 'SOURCES_LIST',
+                  sources
                 },
                 id
               },
