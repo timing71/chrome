@@ -2,14 +2,18 @@
 import { createPageURL, createStartURL, getConfig, objectFromEntries } from "./config";
 import { purge } from "./services";
 
+const createWindow = (url) => {
+  chrome.windows.create({ type: 'popup', url }).then(
+    window => chrome.tabs.update(window.tabs[0].id, { autoDiscardable: false })
+  );
+};
+
 const showT71Page = (page, devMode) => {
-  return chrome.windows.create({ type: 'popup', url: createPageURL(page, devMode) });
+  createWindow(createPageURL(page, devMode));
 };
 
 const launchTiming71 = (sourceURL, devMode) => {
-  chrome.windows.create({ type: 'popup', url: createStartURL(sourceURL, devMode) }).then(
-    window => chrome.tabs.update(window.tabs[0].id, { autoDiscardable: false })
-  );
+  createWindow(createStartURL(sourceURL, devMode));
 };
 
 chrome.runtime.onInstalled.addListener(getConfig);
