@@ -13,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Check out git tags
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: 14
           cache: 'yarn'
 
       - name: Install dependencies
@@ -34,7 +34,7 @@ jobs:
         run: echo "git_describe=$(git describe --tags --always)" >> $GITHUB_ENV
 
       - name: Create extension ZIP
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v3
         with:
           name: timing71-chrome-plugin-${{env.git_describe}}
           path: |
@@ -42,7 +42,7 @@ jobs:
             !build/*.js.map
 
       - name: Create JS sourcemaps
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v3
         with:
           name: timing71-chrome-plugin-${{env.git_describe}}-sourcemaps
           path: build/*.js.map
