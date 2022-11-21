@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.15.4",
+    "@timing71/common": "^0.0.3",
     "@zip.js/zip.js": "^2.3.23",
     "dexie": "^3.2.2",
     "file-saver": "^2.0.5",

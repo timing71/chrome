@@ -1,3 +1,4 @@
+import { createIframe } from '@timing71/common';
 import { fetchService, getAllServiceStates } from "./services";
 
 const zip = require("@zip.js/zip.js");
@@ -24,20 +25,31 @@ export const generateReplay = async (serviceUUID, onProgress) => {
     new zip.TextReader(JSON.stringify(manifest))
   );
 
+  // Note: states is implicitly sorted per the `where` clause used in the Dexie query.
   states = await getAllServiceStates(serviceUUID);
 
   let idx = 0;
 
   const promises = [];
 
+  let prevState = null;
+  let stateCounter = 0;
+
   await states.each(
     ({ state, timestamp }) => {
       delete state.manifest;
-      const filename = `${Math.floor(timestamp / 1000)}.json`.padStart(16, '0');
+
+      const shouldBeIframe = !!prevState && (stateCounter++ % 10) !== 0;
+
+      const timePart = `${Math.floor(timestamp / 1000)}`.padStart(11, '0');
+      const filePart = `${shouldBeIframe ? 'i' : ''}.json`;
+      const filename = `${timePart}${filePart}`;
+
+      const writableState = shouldBeIframe ? createIframe({ ...prevState }, state) : state;
 
       const promise = writer.add(
         filename,
-        new zip.TextReader(JSON.stringify(state))
+        new zip.TextReader(JSON.stringify(writableState))
       ).then(
         () => {
           // Potential race condition here, but it's just progress feedback so might not be important...
@@ -45,10 +57,13 @@ export const generateReplay = async (serviceUUID, onProgress) => {
         }
       ).catch(
         e => {
-          console.error(`Error adding state from timestamp ${timestamp}`, e); // eslint-disable-line no-console
+          // console.error(`Error adding state from timestamp ${timestamp}`, e);
+          // Most likely a "file already exists" error from zip.js which we can
+          // safely ignore
           return Promise.resolve();
         }
       );
+      prevState = { ...state };
       promises.push(promise);
     }
   );
