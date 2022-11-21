@@ -118,32 +118,53 @@ export const deleteService = (uuid) => {
   ]);
 };
 
-export const purge = async () => {
-  const serviceCount = await db.services.count();
-  const statesCount = await db.service_states.count();
-  console.log(`Database contains ${serviceCount} service(s) and ${statesCount} states. Beginning purge...`); // eslint-disable-line no-console
-  // Delete all data for services whose state hasn't been updated in the last 7 days
-  const threshold = Date.now() - (7 * 24 * 60 * 60 * 1000);
-  const candidateServices = await db.services.where('startTime').below(threshold).primaryKeys();
+export const purge = () => {
+  return db.transaction(
+    'rw!',
+    [db.services, db.service_states, db.service_analyses],
+    async () => {
+      const serviceCount = await db.services.count();
+      const statesCount = await db.service_states.count();
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`Purging is disabled as NODE_ENV is ${process.env.NODE_ENV}`); // eslint-disable-line no-console
-  }
-  else {
-    candidateServices.forEach(
-      uuid => {
-        getServiceStateAt(uuid).then(
-          latestState => {
-            const latestTimestamp = latestState?.timestamp;
+      console.log(`Database contains ${serviceCount} service(s) and ${statesCount} states. Beginning purge...`); // eslint-disable-line no-console
 
-            if (!latestTimestamp || latestTimestamp < threshold) {
-              deleteService(uuid);
-            }
+      // Delete all data for services whose state hasn't been updated in the last 7 days
+      const threshold = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const candidateServices = await db.services.where('startTime').below(threshold).primaryKeys();
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Purging is disabled as NODE_ENV is ${process.env.NODE_ENV}`); // eslint-disable-line no-console
+      }
+      else {
+        candidateServices.forEach(
+          uuid => {
+            getServiceStateAt(uuid).then(
+              latestState => {
+                const latestTimestamp = latestState?.timestamp;
+
+                if (!latestTimestamp || latestTimestamp < threshold) {
+                  deleteService(uuid);
+                }
+              }
+            ).catch(
+              e => console.error(e) // eslint-disable-line no-console
+            );
           }
-        ).catch(
-          e => console.error(e) // eslint-disable-line no-console
         );
       }
-    );
-  }
+
+      // In any case tidy up orphans
+      const knownServiceIDs = await db.services.toCollection().primaryKeys();
+
+      let orphans = -1 ;
+
+      while (orphans !== 0) {
+        // Chunk into 1000s to prevent OOMing with large orphan sets
+        orphans = await db.service_states.where('uuid').noneOf(knownServiceIDs).limit(1000).delete();
+        if (orphans > 0) {
+          console.log(`Removed ${orphans} orphaned states`); // eslint-disable-line no-console
+        }
+      }
+    }
+  );
 };
