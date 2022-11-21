@@ -6,8 +6,8 @@
   "repository": "https://github.com/timing71/beta-chrome",
   "author": "James Muscat <jamesremuscat@gmail.com>",
   "license": "AGPL-3.0-or-later",
-  "engines" : {
-    "node" : ">=16.0.0"
+  "engines": {
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.15.4",
