@@ -1,6 +1,6 @@
 {
   "name": "@timing71/browser-plugin",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Timing71 Browser Plugin",
   "main": "background.js",
   "repository": "https://github.com/timing71/beta-chrome",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.15.4",
-    "@timing71/common": "^0.0.3",
+    "@timing71/common": "^0.1.0",
     "@zip.js/zip.js": "^2.3.23",
     "dexie": "^3.2.2",
     "file-saver": "^2.0.5",

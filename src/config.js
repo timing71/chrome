@@ -1,7 +1,7 @@
 /* global chrome */
 
 const DEV_URL_ROOT =  'http://localhost:3000';
-const PROD_URL_ROOT = 'https://beta.timing71.org';
+const PROD_URL_ROOT = 'https://www.timing71.org';
 
 const URL_ROOT = process.env.NODE_ENV === 'production' ? PROD_URL_ROOT : DEV_URL_ROOT;
 

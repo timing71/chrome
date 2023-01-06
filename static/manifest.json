@@ -1,7 +1,7 @@
 {
   "name": "Timing71",
   "description": "Timing71 browser extension",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
@@ -32,7 +32,7 @@
     "tabs"
   ],
   "action": {
-    "default_title": "Timing71 Beta",
+    "default_title": "Timing71",
     "default_popup": "menu.html"
   },
   "icons": {
