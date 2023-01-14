@@ -73,7 +73,7 @@ export const generateReplay = async (serviceUUID, onProgress) => {
 
   await writer.close();
 
-  const blob = blobWriter.getData();
+  const blob = await blobWriter.getData();
 
   FileSaver.saveAs(
     blob,
