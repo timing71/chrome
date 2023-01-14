@@ -1,8 +1,8 @@
 # Timing71 Chrome extension
 
-![GitHub package.json version](https://img.shields.io/github/package-json/v/timing71/beta-chrome)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/timing71/beta-chrome/main.yml?branch=master)
-![AGPL v3.0](https://img.shields.io/github/license/timing71/beta-chrome)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/timing71/chrome)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/timing71/chrome/main.yml?branch=master)
+![AGPL v3.0](https://img.shields.io/github/license/timing71/chrome)
 ![Twitter Follow](https://img.shields.io/twitter/follow/timing_71?style=social)
 
 This repo is the source code to the [Chrome extension](https://chrome.google.com/webstore/detail/timing71/pjdcehojcogjpilmeliklfddboeoogpd)
