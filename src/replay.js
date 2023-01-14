@@ -18,6 +18,7 @@ export const generateReplay = async (serviceUUID, onProgress) => {
   const manifest =
   {
     ...finalState.state.manifest,
+    startTime: Math.floor(finalState.state.manifest.startTime / 1000),
     version: 1
   };
   await writer.add(
