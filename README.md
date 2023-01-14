@@ -1,16 +1,16 @@
-# Timing71 Beta Chrome extension
+# Timing71 Chrome extension
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/timing71/beta-chrome)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/timing71/beta-chrome/CI)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/timing71/beta-chrome/main.yml?branch=master)
 ![AGPL v3.0](https://img.shields.io/github/license/timing71/beta-chrome)
 ![Twitter Follow](https://img.shields.io/twitter/follow/timing_71?style=social)
 
 This repo is the source code to the [Chrome extension](https://chrome.google.com/webstore/detail/timing71/pjdcehojcogjpilmeliklfddboeoogpd)
-for [Timing71 Beta](https://beta.timing71.org/), a motorsport live timing and
+for [Timing71](https://www.timing71.org/), a motorsport live timing and
 analysis system that runs in a user's browser.
 
 The plugin is a thin layer of code that enables in-browser functionality for
-code hosted at [beta.timing71.org](https://beta.timing71.org), including:
+code hosted at [www.timing71.org](https://www.timing71.org), including:
 
 * Access to extended storage/IndexedDB
 * Cross-origin communication
@@ -20,13 +20,13 @@ code hosted at [beta.timing71.org](https://beta.timing71.org), including:
 
 Due to [run-time restrictions imposed by Chrome's Manifest V3](https://bugs.chromium.org/p/chromium/issues/detail?id=1152255),
 the majority of functionality here is in `host.js`, which runs via an iframe
-injected by `injector.js` into the host pages at `beta.timing71.org`, rather
+injected by `injector.js` into the host pages at `www.timing71.org`, rather
 than as a background service worker. That iframe runs with the permissions of
 the Chrome extension so is able to establish connections to timing providers.
 
 ## Configuration
 
-Configuration is loaded at runtime from `beta.timing71.org` and cached in local
+Configuration is loaded at runtime from `www.timing71.org` and cached in local
 storage by `config.js`.
 
 ## Database structure
