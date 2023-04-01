@@ -26,6 +26,10 @@ db.version(4).stores({
   service_analyses: 'uuid'
 });
 
+db.version(5).stores({
+  transient_data: 'uuid'
+});
+
 export const listServices = async () => {
   const services = await db.services.toArray();
 
@@ -60,12 +64,6 @@ export const startService = async (uuid, source) => {
   });
 };
 
-export const terminateService = async (uuid) => {
-  await db.services.delete(uuid);
-  await db.service_states.delete(uuid);
-  await db.service_analyses.delete(uuid);
-};
-
 const getServiceStateAt = (uuid, timestamp=null) => {
   return db.service_states
   .where('[uuid+timestamp]')
@@ -77,10 +75,13 @@ export const fetchService = async (uuid, timestamp=null) => {
   const service = await db.services.get(uuid);
   const state = await getServiceStateAt(uuid, timestamp);
   const analysis = await db.service_analyses.get(uuid);
+  const transient_data = await db.transient_data.get(uuid);
+
   return {
     analysis,
     service,
-    state: state?.state
+    state: state?.state,
+    transient_data
   };
 };
 
@@ -102,6 +103,9 @@ export const updateServiceAnalysis = async (uuid, state, timestamp=null) => {
   });
 };
 
+export const saveTransientData = async (uuid, data) => {
+  await db.transient_data.put({ uuid, data });
+};
 
 export const getAllServiceStates = async (uuid) => {
   const states = await db.service_states
@@ -114,6 +118,7 @@ export const deleteService = (uuid) => {
   return Promise.all([
     db.service_states.where('uuid').equals(uuid).delete(),
     db.service_analyses.delete(uuid),
+    db.transient_data.delete(uuid),
     db.services.delete(uuid)
   ]);
 };

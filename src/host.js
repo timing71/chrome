@@ -2,7 +2,7 @@
 
 import { objectFromEntries } from "./config";
 import { generateAnalysis, generateReplay } from "./replay";
-import { deleteService, fetchService, listServices, listServiceSources, startService, updateServiceAnalysis, updateServiceState } from "./services";
+import { deleteService, fetchService, listServices, listServiceSources, saveTransientData, startService, updateServiceAnalysis, updateServiceState } from "./services";
 
 const _openWebsockets = {};
 
@@ -113,6 +113,11 @@ const handleMessage = ({ data, origin }) => {
 
       case 'UPDATE_SERVICE_ANALYSIS':
         updateServiceAnalysis(message.uuid, message.analysis, message.timestamp);
+        nullReply();
+        break;
+
+      case 'SAVE_TRANSIENT_DATA':
+        saveTransientData(message.uuid, message.data);
         nullReply();
         break;
 
