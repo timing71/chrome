@@ -30,19 +30,42 @@ db.version(5).stores({
   transient_data: 'uuid'
 });
 
+db.version(6).stores({
+  service_states: '[uuid+timestamp], [uuid+sessionIndex], [uuid+sessionIndex+timestamp], uuid, timestamp',
+  service_analyses: 'uuid, [uuid+sessionIndex]'
+});
+
 export const listServices = async () => {
   const services = await db.services.toArray();
 
-  await Promise.all(
+  return await Promise.all(
     services.map(
       async s => {
-        const state = await getServiceStateAt(s.uuid);
-        s.state = state?.state;
+        const maxSessionIndex = s.currentSessionIndex;
+
+        if (maxSessionIndex === undefined) {
+          const state = await getServiceStateAt(s.uuid);
+          return {
+            ...s,
+            sessions: [state?.state]
+          };
+        }
+        else {
+          const sessions = [];
+
+          for (let idx = 0; idx <= maxSessionIndex; idx++) {
+            const state = await getSessionStateAt(s.uuid, idx);
+            sessions.push(state?.state);
+          }
+
+          return {
+            ...s,
+            sessions
+          };
+        }
       }
     )
   );
-
-  return services;
 };
 
 export const listServiceSources = async () => {
@@ -54,11 +77,13 @@ export const startService = async (uuid, source) => {
   const ts = Date.now();
   await db.services.put({
     uuid,
+    currentSessionIndex: 0,
     source,
     startTime: ts
   });
   await db.service_analyses.put({
     uuid,
+    sessionIndex: 0,
     state: {  ...DEFAULT_ANALYSIS_STATE },
     timestamp: ts
   });
@@ -71,10 +96,19 @@ const getServiceStateAt = (uuid, timestamp=null) => {
   .last();
 };
 
+export const getSessionStateAt = (uuid, sessionIndex, timestamp=null) => {
+  return db.service_states
+  .where('[uuid+sessionIndex+timestamp]')
+  .between([uuid, sessionIndex || Dexie.minKey, Dexie.minKey], [uuid, sessionIndex || Dexie.maxKey, timestamp || Dexie.maxKey], true, true)
+  .last();
+};
+
+export const getAnalysisAtIndex = (uuid, sessionIndex) => db.service_analyses.get({ uuid, sessionIndex });
+
 export const fetchService = async (uuid, timestamp=null) => {
   const service = await db.services.get(uuid);
   const state = await getServiceStateAt(uuid, timestamp);
-  const analysis = await db.service_analyses.get(uuid);
+  const analysis = await db.service_analyses.get({ uuid, sessionIndex: state?.currentSessionIndex || 0 });
   const transient_data = await db.transient_data.get(uuid);
 
   return {
@@ -85,19 +119,23 @@ export const fetchService = async (uuid, timestamp=null) => {
   };
 };
 
-export const updateServiceState = async (uuid, state, timestamp=null) => {
+export const updateServiceState = async (uuid, sessionIndex, state, timestamp=null) => {
   const myTimestamp = timestamp || Date.now();
   await db.service_states.put({
     uuid,
+    sessionIndex,
     state,
     timestamp: myTimestamp
   }, [uuid, myTimestamp]);
+
+  await db.services.update(uuid, { currentSessionIndex: sessionIndex });
 };
 
-export const updateServiceAnalysis = async (uuid, state, timestamp=null) => {
+export const updateServiceAnalysis = async (uuid, sessionIndex, state, timestamp=null) => {
   const myTimestamp = timestamp || Date.now();
   await db.service_analyses.put({
     uuid,
+    sessionIndex,
     state,
     timestamp: myTimestamp
   });
@@ -107,10 +145,10 @@ export const saveTransientData = async (uuid, data) => {
   await db.transient_data.put({ uuid, data });
 };
 
-export const getAllServiceStates = async (uuid) => {
+export const getAllServiceStates = async (uuid, sessionIndex) => {
   const states = await db.service_states
-    .where('[uuid+timestamp]')
-    .between([uuid, Dexie.minKey], [uuid, Dexie.maxKey], true, true);
+    .where('[uuid+sessionIndex+timestamp]')
+    .between([uuid, sessionIndex, Dexie.minKey], [uuid, sessionIndex, Dexie.maxKey], true, true);
     return states;
 };
 

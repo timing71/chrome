@@ -1,15 +1,15 @@
 import { createIframe } from '@timing71/common';
-import { fetchService, getAllServiceStates } from "./services";
+import { getAllServiceStates, getAnalysisAtIndex, getSessionStateAt } from "./services";
 
 const zip = require("@zip.js/zip.js");
 const FileSaver = require('file-saver');
 
 const filenameFromManifest = (manifest, extension) => `${manifest.name} - ${manifest.description}.${extension}`;
 
-export const generateReplay = async (serviceUUID, onProgress) => {
-  let states = await getAllServiceStates(serviceUUID);
+export const generateReplay = async (serviceUUID, sessionIndex, onProgress) => {
+  let states = await getAllServiceStates(serviceUUID, sessionIndex);
   const stateCount = await states.count();
-  console.log(`Creating replay for ${serviceUUID} with ${stateCount} states`); //eslint-disable-line no-console
+  console.log(`Creating replay for ${serviceUUID}:${sessionIndex} with ${stateCount} states`); //eslint-disable-line no-console
 
   const blobWriter = new zip.BlobWriter("application/zip");
   const writer = new zip.ZipWriter(blobWriter);
@@ -82,8 +82,9 @@ export const generateReplay = async (serviceUUID, onProgress) => {
 
 };
 
-export const generateAnalysis = async (serviceUUID) => {
-  const { analysis, state } = await fetchService(serviceUUID);
+export const generateAnalysis = async (serviceUUID, sessionIndex) => {
+  const analysis = await getAnalysisAtIndex(serviceUUID, sessionIndex);
+  const state = await getSessionStateAt(serviceUUID, sessionIndex);
 
   const json = JSON.stringify(analysis.state);
   const blob = new Blob([json], { type: 'application.json;charset=utf-8' });

@@ -107,12 +107,12 @@ const handleMessage = ({ data, origin }) => {
         break;
 
       case 'UPDATE_SERVICE_STATE':
-        updateServiceState(message.uuid, message.state, message.timestamp);
+        updateServiceState(message.uuid, message.sessionIndex || 0, message.state, message.timestamp);
         nullReply();
         break;
 
       case 'UPDATE_SERVICE_ANALYSIS':
-        updateServiceAnalysis(message.uuid, message.analysis, message.timestamp);
+        updateServiceAnalysis(message.uuid, message.sessionIndex || 0, message.analysis, message.timestamp);
         nullReply();
         break;
 
@@ -129,7 +129,7 @@ const handleMessage = ({ data, origin }) => {
             progress
           });
         };
-        generateReplay(message.uuid, generationProgress).then(
+        generateReplay(message.uuid, message.sessionIndex, generationProgress).then(
           () => send(
             {
               type: 'REPLAY_GENERATION_FINISHED',
@@ -148,7 +148,7 @@ const handleMessage = ({ data, origin }) => {
         break;
 
       case 'GENERATE_ANALYSIS_DOWNLOAD':
-        generateAnalysis(message.uuid).then(
+        generateAnalysis(message.uuid, message.sessionIndex).then(
           () => send(
             {
               type: 'ANALYSIS_GENERATION_FINISHED',
