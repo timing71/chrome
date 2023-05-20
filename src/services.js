@@ -9,10 +9,6 @@ if (typeof(window) !== 'undefined') {
 
 const db = new Dexie('timing71_services');
 
-const DEFAULT_ANALYSIS_STATE = {
-  version: 2
-};
-
 db.version(2).stores({
   services: 'uuid',
   service_states: '[uuid+timestamp], uuid, timestamp'
@@ -86,7 +82,7 @@ export const startService = async (uuid, source) => {
   await db.service_analyses.put({
     uuid,
     sessionIndex: 0,
-    state: {  ...DEFAULT_ANALYSIS_STATE },
+    state: {},
     timestamp: ts
   });
 };
