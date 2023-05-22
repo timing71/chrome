@@ -1,7 +1,8 @@
 /* global chrome */
 import { createPageURL, createStartURL, getConfig, objectFromEntries } from "./config";
-import { deleteService, fetchService, listServices, listServiceSources, saveTransientData, startService, updateServiceAnalysis, updateServiceState, purge } from "./services";
+import { deleteService, fetchService, listServices, saveTransientData, startService, updateServiceAnalysis, updateServiceState, purge } from "./services";
 import { generateAnalysis, generateReplay } from "./replay";
+import { readSetting, writeSetting } from "./settings";
 
 const createWindow = (url) => {
   chrome.windows.create({ type: 'popup', url }).then(
@@ -88,15 +89,27 @@ chrome.runtime.onMessage.addListener(
         switch (message.type) {
           case 'START_SERVICE':
             startService(message.uuid, message.source).then(
-              sendResponse(
-                {
-                  message: {
-                    type: 'START_SERVICE_RETURN',
-                    originalMessage: message
-                  },
-                  id
-                }
-              )
+              () => {
+                readSetting('recentSources', []).then(
+                  recent => {
+                    const newRecent = [
+                      message.source,
+                      ...recent.filter(r => r !== message.source)
+                    ].slice(0, 20);
+                    writeSetting('recentSources', newRecent);
+                  }
+                );
+
+                sendResponse(
+                  {
+                    message: {
+                      type: 'START_SERVICE_RETURN',
+                      originalMessage: message
+                    },
+                    id
+                  }
+                );
+              }
             );
             return true;
 
@@ -141,22 +154,6 @@ chrome.runtime.onMessage.addListener(
                     message: {
                       type: 'SERVICES_LIST',
                       services
-                    },
-                    id
-                  }
-                );
-              }
-            );
-            return true;
-
-          case 'RETRIEVE_SOURCES_LIST':
-            listServiceSources().then(
-              sources => {
-                sendResponse(
-                  {
-                    message: {
-                      type: 'SOURCES_LIST',
-                      sources
                     },
                     id
                   }

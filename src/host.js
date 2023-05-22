@@ -1,6 +1,7 @@
 /* global chrome */
 
 import { objectFromEntries } from "./config";
+import { readSetting, readSettings, writeSettings } from "./settings";
 
 const FileSaver = require('file-saver');
 
@@ -17,7 +18,6 @@ const send = (data, origin='*') => {
 
 const PASSTHROUGH_MESSAGE_TYPES = [
   'RETRIEVE_SERVICES_LIST',
-  'RETRIEVE_SOURCES_LIST',
   'START_SERVICE',
   'FETCH_SERVICE',
   'UPDATE_SERVICE_STATE',
@@ -49,26 +49,38 @@ const handleMessage = ({ data, origin }) => {
     else {
       switch (message.type) {
         case 'RETRIEVE_SETTINGS':
-          chrome.storage.sync.get(
-            null,
-            (settings) => {
-              send(
-                {
-                  message: {
-                    type: 'SETTINGS_RETRIEVED',
-                    settings
-                  },
-                  id
+
+        readSettings().then(
+          (settings) => {
+            send(
+              {
+                message: {
+                  type: 'SETTINGS_RETRIEVED',
+                  settings
                 },
-                origin
-              );
-            }
-          );
-          break;
+                id
+              },
+              origin
+            );
+          }
+        );
+        break;
 
         case 'STORE_SETTINGS':
-          chrome.storage.sync.set(message.settings);
+          writeSettings(message.settings);
           nullReply();
+          break;
+
+        case 'RETRIEVE_SOURCES_LIST':
+          readSetting('recentSources', []).then(
+            sources => send({
+              message: {
+                type: 'SOURCES_LIST',
+                sources
+              },
+              id
+            }, origin)
+          );
           break;
 
         case 'GENERATE_SERVICE_REPLAY':
