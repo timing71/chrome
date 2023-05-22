@@ -1,12 +1,11 @@
 import { createIframe } from '@timing71/common';
-import { getAllServiceStates, getAnalysisAtIndex, getSessionStateAt } from "./services";
+import { getAllServiceStates, getAnalysisAtIndex } from "./services";
 
 const zip = require("@zip.js/zip.js");
-const FileSaver = require('file-saver');
 
 const filenameFromManifest = (manifest, extension) => `${manifest.name} - ${manifest.description}.${extension}`;
 
-export const generateReplay = async (serviceUUID, sessionIndex, onProgress) => {
+export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) => {
   let states = await getAllServiceStates(serviceUUID, sessionIndex);
   const stateCount = await states.count();
   console.log(`Creating replay for ${serviceUUID}:${sessionIndex} with ${stateCount} states`); //eslint-disable-line no-console
@@ -27,7 +26,7 @@ export const generateReplay = async (serviceUUID, sessionIndex, onProgress) => {
   );
 
   // Note: states is implicitly sorted per the `where` clause used in the Dexie query.
-  states = await getAllServiceStates(serviceUUID);
+  states = await getAllServiceStates(serviceUUID, sessionIndex);
 
   let idx = 0;
 
@@ -75,21 +74,20 @@ export const generateReplay = async (serviceUUID, sessionIndex, onProgress) => {
 
   const blob = await blobWriter.getData();
 
-  FileSaver.saveAs(
+  return {
     blob,
-    filenameFromManifest(manifest, 'zip')
-  );
+    filename: filenameFromManifest(manifest, 'zip')
+  };
 
 };
 
-export const generateAnalysis = async (serviceUUID, sessionIndex) => {
+export const generateAnalysis = async (serviceUUID, sessionIndex=0) => {
   const analysis = await getAnalysisAtIndex(serviceUUID, sessionIndex);
-  const state = await getSessionStateAt(serviceUUID, sessionIndex);
 
   const json = JSON.stringify(analysis.state);
-  const blob = new Blob([json], { type: 'application.json;charset=utf-8' });
-  FileSaver.saveAs(
-    blob,
-    filenameFromManifest(state.manifest, 'json')
-  );
+
+  return {
+    analysis: json,
+    filename: filenameFromManifest(analysis.state.manifest, 'json')
+  };
 };

@@ -1,6 +1,7 @@
 /* global chrome */
 import { createPageURL, createStartURL, getConfig, objectFromEntries } from "./config";
-import { purge } from "./services";
+import { deleteService, fetchService, listServices, listServiceSources, saveTransientData, startService, updateServiceAnalysis, updateServiceState, purge } from "./services";
+import { generateAnalysis, generateReplay } from "./replay";
 
 const createWindow = (url) => {
   chrome.windows.create({ type: 'popup', url }).then(
@@ -79,7 +80,155 @@ chrome.runtime.onMessage.addListener(
         );
         return true;
 
+      case 'PASSTHROUGH':
+        const { message, id } = msg;
+
+        const nullReply = () => sendResponse({ id });
+
+        switch (message.type) {
+          case 'START_SERVICE':
+            startService(message.uuid, message.source).then(
+              sendResponse(
+                {
+                  message: {
+                    type: 'START_SERVICE_RETURN',
+                    originalMessage: message
+                  },
+                  id
+                }
+              )
+            );
+            return true;
+
+          case 'FETCH_SERVICE':
+            fetchService(message.uuid, message.timestamp).then(
+              ss => sendResponse({
+                message: {
+                  type: 'FETCH_SERVICE_RETURN',
+                  ...ss
+                },
+                id
+              })
+            );
+            return true;
+
+          case 'UPDATE_SERVICE_STATE':
+            updateServiceState(message.uuid, message.sessionIndex || 0, message.state, message.timestamp);
+            nullReply();
+            return true;
+
+          case 'UPDATE_SERVICE_ANALYSIS':
+            updateServiceAnalysis(message.uuid, message.sessionIndex || 0, message.analysis, message.timestamp);
+            nullReply();
+            return true;
+
+          case 'SAVE_TRANSIENT_DATA':
+            saveTransientData(message.uuid, message.data);
+            nullReply();
+            return true;
+
+          case 'DELETE_SERVICE':
+            deleteService(message.uuid).then(
+              nullReply()
+            );
+            return true;
+
+          case 'RETRIEVE_SERVICES_LIST':
+            listServices().then(
+              services => {
+                sendResponse(
+                  {
+                    message: {
+                      type: 'SERVICES_LIST',
+                      services
+                    },
+                    id
+                  }
+                );
+              }
+            );
+            return true;
+
+          case 'RETRIEVE_SOURCES_LIST':
+            listServiceSources().then(
+              sources => {
+                sendResponse(
+                  {
+                    message: {
+                      type: 'SOURCES_LIST',
+                      sources
+                    },
+                    id
+                  }
+                );
+              }
+            );
+            return true;
+
+          default:
+
+        }
+
+        break;
+
       default:
     }
+  }
+);
+
+const CHUNK_SIZE = 128 * 1024;
+
+chrome.runtime.onConnect.addListener(
+  (port) => {
+    port.onMessage.addListener(
+      (msg) => {
+        if (msg.type === 'GENERATE_SERVICE_REPLAY') {
+
+          const handleProgress = (progress) => {
+            port.postMessage({
+              type: 'REPLAY_GENERATION_PROGRESS',
+              progress
+            });
+          };
+
+          generateReplay(msg.uuid, msg.sessionIndex, handleProgress).then(
+            ({ blob, filename }) => {
+
+              const reader = new FileReader();
+              reader.onload = () => {
+                const buffer = reader.result;
+
+                const chunks = Math.ceil(buffer.length / CHUNK_SIZE);
+
+                for (let chunkIdx = 0; chunkIdx < chunks; chunkIdx++) {
+                  port.postMessage({
+                    type: 'REPLAY_DATA',
+                    filename,
+                    chunkIdx,
+                    totalChunks: chunks,
+                    data: buffer.slice(CHUNK_SIZE * chunkIdx, CHUNK_SIZE * (chunkIdx + 1))
+                  });
+                }
+
+
+              };
+              reader.readAsBinaryString(blob);
+            }
+          );
+
+        }
+        else if (msg.type === 'GENERATE_ANALYSIS_DOWNLOAD') {
+          generateAnalysis(msg.uuid, msg.sessionIndex).then(
+            ({ analysis, filename }) => {
+              port.postMessage({
+                type: 'ANALYSIS_GENERATION_FINISHED',
+                analysis,
+                filename
+              });
+            }
+          );
+        }
+      }
+    );
   }
 );

@@ -1,5 +1,12 @@
 import Dexie from "dexie";
 
+if (typeof(window) !== 'undefined') {
+  console.error( // eslint-disable-line no-console
+    'services.js is being included from web-side code (window is defined). DB ' +
+    'access is only possible from extension-side code.'
+  );
+}
+
 const db = new Dexie('timing71_services');
 
 const DEFAULT_ANALYSIS_STATE = {
