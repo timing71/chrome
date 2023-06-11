@@ -1,11 +1,13 @@
 /* global chrome */
 
+import ReconnectingEventSource from "reconnecting-eventsource";
 import { objectFromEntries } from "./config";
 import { readSetting, readSettings, writeSettings } from "./settings";
 
 const FileSaver = require('file-saver');
 
 const _openWebsockets = {};
+const _openEventSources = {};
 
 const _insecureFetches = {};
 let _insecureFetchIndex = 0;
@@ -283,6 +285,44 @@ const handleMessage = ({ data, origin }) => {
             const ws = _openWebsockets[message.tag];
             delete _openWebsockets[message.tag];
             ws.close();
+          }
+          nullReply();
+          break;
+
+        case 'OPEN_EVENT_SOURCE':
+          if (!_openEventSources[message.tag]) {
+            const es = new ReconnectingEventSource(message.url);
+            es.onopen = () => send({
+              type: 'EVENT_SOURCE_OPEN',
+              tag: message.tag
+            }, origin);
+
+            es.onerror = (e) => send({
+              type: 'EVENT_SOURCE_ERROR',
+              tag: message.tag,
+              error: e
+            }, origin);
+
+            es.onmessage = (msg) => send({
+              type: 'EVENT_SOURCE_MESSAGE',
+              tag: message.tag,
+              data: msg.data
+            });
+
+          }
+          else {
+            send({
+              type: 'EVENT_SOURCE_OPEN',
+              tag: message.tag
+            }, origin);
+          }
+          break;
+
+        case 'CLOSE_EVENT_SOURCE':
+          if (_openEventSources[message.tag]) {
+            const es = _openEventSources[message.tag];
+            delete _openEventSources[message.tag];
+            es.close();
           }
           nullReply();
           break;

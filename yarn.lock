@@ -4404,6 +4404,11 @@ rechoir@^0.8.0:
   dependencies:
     resolve "^1.20.0"
 
+reconnecting-eventsource@^1.6.2:
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/reconnecting-eventsource/-/reconnecting-eventsource-1.6.2.tgz#b7f5b03b1c76291f6fbcb0203004892a57ae253b"
+  integrity sha512-vHhoxVLbA2YcfljWMKEbgR1KVTgwIrnyh/bzVJc+gfQbGcUIToLL6jNhkUL4E+9FbnAcfUVNLIw2YCiliTg/4g==
+
 regenerate-unicode-properties@^10.1.0:
   version "10.1.0"
   resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-10.1.0.tgz#7c3192cab6dd24e21cb4461e5ddd7dd24fa8374c"
