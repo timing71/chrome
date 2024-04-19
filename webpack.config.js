@@ -24,6 +24,9 @@ const common = {
   },
   resolve: {
     extensions: ['.js', '.jsx'],
+    fallback: {
+      "url": false
+    }
   },
   output: {
     chunkFilename: '[name].bundle.js',
