@@ -223,7 +223,7 @@ const handleMessage = ({ data, origin }) => {
 
         case 'OPEN_WEBSOCKET':
           if (!_openWebsockets[message.tag]) {
-            const ws = new WebSocket(`${message.url}`);
+            const ws = new WebSocket(`${message.url}`, message.protocols || []);
 
             ws.onopen = () => {
               send(
