@@ -11,16 +11,29 @@ const launchT71 = (url) => {
   chrome.runtime.sendMessage({ type: 'LAUNCH_T71', source: url, devMode: process.env.NODE_ENV === 'development' });
 };
 
-const updateAndShowConfigVersion = () => {
-  const configVersionElem = document.getElementById('config-version');
-  configVersionElem.innerText = '...';
-  configVersionElem.classList.add('loading');
+const updateAndShowVersions = () => {
+
+  const versionsHolder = document.getElementById('versions');
+  versionsHolder.innerHTML = '';
+
+  const pluginVersion = chrome.runtime.getManifest().version;
+
+  versionsHolder.appendChild(makeVersionDiv('Plugin', pluginVersion));
+
   getConfig(true).then(
     config => {
-      configVersionElem.innerText = config.version;
-      configVersionElem.classList.remove('loading');
+      const { common, services, web } = config.versions;
+      versionsHolder.appendChild(makeVersionDiv('Common', common));
+      versionsHolder.appendChild(makeVersionDiv('Services', services));
+      versionsHolder.appendChild(makeVersionDiv('Web', web));
     }
   );
+};
+
+const makeVersionDiv = (label, version) => {
+  const div = document.createElement('div');
+  div.innerText = `${label} v${version}`;
+  return div;
 };
 
 document.addEventListener(
@@ -45,11 +58,8 @@ document.addEventListener(
       }
     );
 
-    const pluginVersion = chrome.runtime.getManifest().version;
-    document.getElementById('plugin-version').innerText = pluginVersion;
-
-    const configVersionElem = document.getElementById('config-version');
-    configVersionElem.onclick = updateAndShowConfigVersion;
-    updateAndShowConfigVersion();
+    const versionsHolder = document.getElementById('versions');
+    versionsHolder.onclick = updateAndShowVersions;
+    updateAndShowVersions();
   }
 );
