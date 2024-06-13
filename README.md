@@ -3,20 +3,29 @@
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/timing71/chrome)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/timing71/chrome/main.yml?branch=master)
 ![AGPL v3.0](https://img.shields.io/github/license/timing71/chrome)
-![Twitter Follow](https://img.shields.io/twitter/follow/timing_71?style=social)
 
 This repo is the source code to the [Chrome extension](https://chrome.google.com/webstore/detail/timing71/pjdcehojcogjpilmeliklfddboeoogpd)
 for [Timing71](https://www.timing71.org/), a motorsport live timing and
 analysis system that runs in a user's browser.
 
+## Feature requests and bug reports
+
+- For feature requests and bug reports relating to the Timing71 site and app,
+  use the [@timing71/web repo](https://github.com/timing71/web) (this is
+  probably the one you want)
+- For feature requests and bug reports relating to analysis data,
+  use the [@timing71/common repo](https://github.com/timing71/common)
+
+## The T71 Chrome plugin
+
 The plugin is a thin layer of code that enables in-browser functionality for
 code hosted at [www.timing71.org](https://www.timing71.org), including:
 
-* Access to extended storage/IndexedDB
-* Cross-origin communication
-* Asynchronous generation of replay files
-* Display of "Launch" button on supported timing provider sites
-* Extension menu options
+- Access to extended storage/IndexedDB
+- Cross-origin communication
+- Asynchronous generation of replay files
+- Display of "Launch" button on supported timing provider sites
+- Extension menu options
 
 Due to [run-time restrictions imposed by Chrome's Manifest V3](https://bugs.chromium.org/p/chromium/issues/detail?id=1152255),
 the majority of functionality here is in `host.js`, which runs via an iframe
@@ -33,10 +42,10 @@ storage by `config.js`.
 
 The service database is defined in `services.js` and contains three tables:
 
-* `services`: storing the start time and data source for each _service_
+- `services`: storing the start time and data source for each _service_
   (e.g. an instance of a connection to a timing provider for a race event).
-* `service_states`: stores every timing screen state for a service. These states
+- `service_states`: stores every timing screen state for a service. These states
   are loosely the same as the Common Timing Format states described
   [here](https://info.timing71.org/reference/state.html), but with additional
   entries to support various features, including the [service manifest](https://info.timing71.org/reference/manifest.html).
-* `service_analyses`: stores the current analysis state for a service.
+- `service_analyses`: stores the current analysis state for a service.
