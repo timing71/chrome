@@ -97,7 +97,12 @@ const getServiceStateAt = (uuid, timestamp=null) => {
 export const getSessionStateAt = (uuid, sessionIndex, timestamp=null) => {
   return db.service_states
   .where('[uuid+sessionIndex+timestamp]')
-  .between([uuid, sessionIndex || Dexie.minKey, Dexie.minKey], [uuid, sessionIndex || Dexie.maxKey, timestamp || Dexie.maxKey], true, true)
+  .between(
+    [uuid, sessionIndex, Dexie.minKey],
+    [uuid, sessionIndex, timestamp || Dexie.maxKey],
+    true,
+    true
+  )
   .last();
 };
 
