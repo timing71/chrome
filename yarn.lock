@@ -1263,10 +1263,10 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.10.2.tgz#053f1540703faa81dea2966b768ee5581c66aeda"
   integrity sha512-hw437iINopmQuxWPSUEvqE56NCPsiU8N4AYtfHmJFckclktzK9YQJieD3XkDCDH4OjL+C7zgPUh73R/nrcHrqw==
 
-"@timing71/common@^0.2.0":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@timing71/common/-/common-0.2.3.tgz#83fda6d773b9bc76ea14ed1c63fa4f6a3affceca"
-  integrity sha512-eEvDajJji24dK4uhwwLBncoCicBYKhttCVe+Jkh7XVPcBW5Y8WN51HfpFWhzvWVGsHrbky96Wvz+MV1I8prTIw==
+"@timing71/common@^0.5.0":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@timing71/common/-/common-0.5.2.tgz#3795f4abff1b946b9d43ea2eb178a74f949c6956"
+  integrity sha512-cw0SKSDjLCpFve/cgNeP6tNB9r5Q/JuOR9gsqExcno4fI+jE9/C7yWy9PfUtMXEkCqYDpVNWSs091f4x3N/gCA==
   dependencies:
     "@zip.js/zip.js" "^2.4.26"
     dayjs "^1.11.6"
@@ -2131,9 +2131,9 @@ camel-case@^4.1.2:
     tslib "^2.0.3"
 
 caniuse-lite@^1.0.30001587:
-  version "1.0.30001611"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001611.tgz#4dbe78935b65851c2d2df1868af39f709a93a96e"
-  integrity sha512-19NuN1/3PjA3QI8Eki55N8my4LzfkMCRLgCVfrl/slbSAchQfV0+GwjPrK3rq37As4UCLlM/DHajbKkAqbv92Q==
+  version "1.0.30001633"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001633.tgz"
+  integrity sha512-6sT0yf/z5jqf8tISAgpJDrmwOpLsrpnyCdD/lOZKvKkkJK4Dn0X5i7KF7THEZhOq+30bmhwBlNEaqPUiHiKtZg==
 
 chalk@^2.4.2:
   version "2.4.2"
