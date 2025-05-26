@@ -1,9 +1,7 @@
-import { createIframe } from '@timing71/common';
+import { createIframe, filenameFromManifest } from '@timing71/common';
 import { getAllServiceStates, getAnalysisAtIndex } from "./services";
 
 const zip = require("@zip.js/zip.js");
-
-const filenameFromManifest = (manifest, extension) => `${manifest.name} - ${manifest.description}.${extension}`.replaceAll(/[\\/]/g, '_');
 
 export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) => {
   let states = await getAllServiceStates(serviceUUID, sessionIndex);
