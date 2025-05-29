@@ -24,7 +24,10 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
   );
 
   // Note: states is implicitly sorted per the `where` clause used in the Dexie query.
+  // https://github.com/dexie/Dexie.js/issues/300 would be useful here... but
+  // we should "only" be dealing with a few hundred MB of data
   states = await getAllServiceStates(serviceUUID, sessionIndex);
+  const statesArray = await states.toArray();
 
   let idx = 0;
 
@@ -32,7 +35,7 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
   let prevTime = null;
   let stateCounter = 0;
 
-  for (const { state, timestamp } of states) {
+  for (const { state, timestamp } of statesArray) {
     delete state.manifest;
 
     const timePart = `${Math.floor(timestamp / 1000)}`.padStart(11, '0');
@@ -45,7 +48,10 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
     const filename = `${timePart}${filePart}`;
 
     const writableState = shouldBeIframe ? createIframe({ ...prevState }, state) : state;
-    await writer.add(filename, new zip.TextReader(JSON.stringify(writableState)));
+    await writer.add(
+      filename,
+      new zip.TextReader(JSON.stringify(writableState))
+    );
     onProgress({ item: idx++, total: stateCount, percent: Math.floor(100 * idx / stateCount) });
     prevState = { ...state };
     prevTime = timePart;
