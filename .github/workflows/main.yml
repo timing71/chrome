@@ -34,7 +34,7 @@ jobs:
         run: echo "git_describe=$(git describe --tags --always)" >> $GITHUB_ENV
 
       - name: Create extension ZIP
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: timing71-chrome-plugin-${{env.git_describe}}
           path: |
@@ -42,7 +42,7 @@ jobs:
             !build/*.js.map
 
       - name: Create JS sourcemaps
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: timing71-chrome-plugin-${{env.git_describe}}-sourcemaps
           path: build/*.js.map
