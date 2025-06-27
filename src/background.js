@@ -190,26 +190,21 @@ chrome.runtime.onConnect.addListener(
 
           generateReplay(msg.uuid, msg.sessionIndex, handleProgress).then(
             ({ blob, filename }) => {
+              blob.arrayBuffer().then(
+                (buffer) => {
+                  const chunks = Math.ceil(buffer.byteLength / CHUNK_SIZE);
 
-              const reader = new FileReader();
-              reader.onload = () => {
-                const buffer = reader.result;
-
-                const chunks = Math.ceil(buffer.length / CHUNK_SIZE);
-
-                for (let chunkIdx = 0; chunkIdx < chunks; chunkIdx++) {
-                  port.postMessage({
-                    type: 'REPLAY_DATA',
-                    filename,
-                    chunkIdx,
-                    totalChunks: chunks,
-                    data: buffer.slice(CHUNK_SIZE * chunkIdx, CHUNK_SIZE * (chunkIdx + 1))
-                  });
+                  for (let chunkIdx = 0; chunkIdx < chunks; chunkIdx++) {
+                    port.postMessage({
+                      type: 'REPLAY_DATA',
+                      filename,
+                      chunkIdx,
+                      totalChunks: chunks,
+                      data: buffer.slice(CHUNK_SIZE * chunkIdx, CHUNK_SIZE * (chunkIdx + 1))
+                    });
+                  }
                 }
-
-
-              };
-              reader.readAsBinaryString(blob);
+              );
             }
           );
 
