@@ -34,6 +34,7 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
   let prevState = null;
   let prevTime = null;
   let stateCounter = 0;
+  let prevFrameFailed = false;
 
   for (const { state, timestamp } of statesArray) {
     delete state.manifest;
@@ -42,16 +43,29 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
     // If the new time part is identical to the previous time part (i.e. we had
     // two frames within a second) then the second should be written as a kframe
     // to avoid jumping states and having iframes not apply cleanly.
-    const shouldBeIframe = !!prevState && (stateCounter++ % 10) !== 0 && timePart !== prevTime;
+    const shouldBeIframe = prevFrameFailed ||
+      (!!prevState &&
+        (stateCounter++ % 10) !== 0 &&
+        timePart !== prevTime
+      );
 
     const filePart = `${shouldBeIframe ? 'i' : ''}.json`;
     const filename = `${timePart}${filePart}`;
 
     const writableState = shouldBeIframe ? createIframe({ ...prevState }, state) : state;
-    await writer.add(
-      filename,
-      new zip.TextReader(JSON.stringify(writableState))
-    );
+    try {
+      await writer.add(
+        filename,
+        new zip.TextReader(JSON.stringify(writableState))
+      );
+      prevFrameFailed = false;
+    }
+    catch {
+      // Most likely a "file already exists" error from zip.js
+      // So long as we make the subsequent frame a keyframe, it's probably fine
+      // to ignore this
+      prevFrameFailed = true;
+    }
     onProgress({ item: idx++, total: stateCount, percent: Math.floor(100 * idx / stateCount) });
     prevState = { ...state };
     prevTime = timePart;
