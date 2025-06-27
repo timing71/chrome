@@ -1,6 +1,6 @@
 /* global chrome */
 import { createPageURL, createStartURL, getConfig, objectFromEntries } from "./config";
-import { deleteService, fetchService, listServices, saveTransientData, startService, updateServiceAnalysis, updateServiceState, purge } from "./services";
+import { deleteService, fetchService, listServices, saveTransientData, startService, updateServiceAnalysis, updateServiceState, purge, setServiceProtection } from "./services";
 import { generateAnalysis, generateReplay } from "./replay";
 import { readSetting, writeSetting } from "./settings";
 
@@ -137,6 +137,11 @@ chrome.runtime.onMessage.addListener(
 
           case 'SAVE_TRANSIENT_DATA':
             saveTransientData(message.uuid, message.data);
+            nullReply();
+            return true;
+
+          case 'SET_SERVICE_PROTECTION':
+            setServiceProtection(message.uuid, message.protectFromDeletion);
             nullReply();
             return true;
 

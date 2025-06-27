@@ -77,7 +77,8 @@ export const startService = async (uuid, source) => {
     uuid,
     currentSessionIndex: 0,
     source,
-    startTime: ts
+    startTime: ts,
+    protectFromDeletion: false
   });
   await db.service_analyses.put({
     uuid,
@@ -155,6 +156,10 @@ export const getAllServiceStates = async (uuid, sessionIndex) => {
     return states;
 };
 
+export const setServiceProtection = async (uuid, protectFromDeletion) => {
+  await db.services.update(uuid, { protectFromDeletion });
+};
+
 export const deleteService = (uuid) => {
   return Promise.all([
     db.service_states.where('uuid').equals(uuid).delete(),
@@ -176,27 +181,27 @@ export const purge = () => {
 
       // Delete all data for services whose state hasn't been updated in the last 7 days
       const threshold = Date.now() - (7 * 24 * 60 * 60 * 1000);
-      const candidateServices = await db.services.where('startTime').below(threshold).primaryKeys();
+      const candidateServices = await db.services.where('startTime').below(threshold).toArray();
 
       if (process.env.NODE_ENV !== 'production') {
         console.log(`Purging is disabled as NODE_ENV is ${process.env.NODE_ENV}`); // eslint-disable-line no-console
       }
       else {
-        candidateServices.forEach(
-          uuid => {
-            getServiceStateAt(uuid).then(
+        for (const service of candidateServices) {
+          if (!service.protectFromDeletion) {
+            getServiceStateAt(service.uuid).then(
               latestState => {
                 const latestTimestamp = latestState?.timestamp;
 
                 if (!latestTimestamp || latestTimestamp < threshold) {
-                  deleteService(uuid);
+                  deleteService(service.uuid);
                 }
               }
             ).catch(
               e => console.error(e) // eslint-disable-line no-console
             );
           }
-        );
+        }
       }
 
       // In any case tidy up orphans
