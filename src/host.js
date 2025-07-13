@@ -103,9 +103,7 @@ const handleMessage = ({ data, origin }) => {
                 }, origin);
               }
               else if (msg.type === 'REPLAY_DATA') {
-                for (let i = 0; i < msg.data.length; i++) {
-                  replayData.push(msg.data.charCodeAt(i));
-                }
+                replayData = replayData.concat(msg.data);
 
                 if (msg.chunkIdx === msg.totalChunks - 1) {
                   // We have all the data

@@ -200,12 +200,13 @@ chrome.runtime.onConnect.addListener(
                   const chunks = Math.ceil(buffer.byteLength / CHUNK_SIZE);
 
                   for (let chunkIdx = 0; chunkIdx < chunks; chunkIdx++) {
+                    const chunk = [...new Uint8Array(buffer.slice(CHUNK_SIZE * chunkIdx, CHUNK_SIZE * (chunkIdx + 1)))];
                     port.postMessage({
                       type: 'REPLAY_DATA',
                       filename,
                       chunkIdx,
                       totalChunks: chunks,
-                      data: buffer.slice(CHUNK_SIZE * chunkIdx, CHUNK_SIZE * (chunkIdx + 1))
+                      data: chunk
                     });
                   }
                 }
