@@ -211,7 +211,7 @@ const handleMessage = ({ data, origin }) => {
                   );
                 }
                 else {
-                  handleError(r.error);
+                  handleError(r.status);
                 }
               }
             ).catch(
