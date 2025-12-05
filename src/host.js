@@ -207,7 +207,10 @@ const handleMessage = ({ data, origin }) => {
               r => {
                 if (r.ok) {
                   r.text().then(
-                    t => handleResponse(t, r.headers && objectFromEntries(r.headers.entries()))
+                    t => {
+                      const headers = (r.headers && objectFromEntries(r.headers.entries())) || {};
+                      handleResponse(t, headers);
+                    }
                   );
                 }
                 else {
