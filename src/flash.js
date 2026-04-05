@@ -4,6 +4,10 @@ import { pageIsSupported } from "./pageRules";
 
 const createFlash = (sourceLocation) => {
 
+  if (!sourceLocation) {
+    return;
+  }
+
   // Make sure Play font is available
   const play = document.createElement('link');
   play.rel = 'stylesheet';
@@ -94,7 +98,7 @@ pageIsSupported(window.location.href).then(
                       const supported = await pageIsSupported(i.src);
                       if (supported) {
                         observer.disconnect();
-                        createFlash(n.src);
+                        createFlash(i.src);
                         break;
                       }
                     }
