@@ -11,7 +11,7 @@ div#t71_flash {
   position: fixed;
   right: 6px;
   top: 6px;
-  z-index: 99999;
+  z-index: 1000000;
 
   border: 1px solid #59ffff;
   border-radius: 0.25em;
