@@ -87,8 +87,12 @@ export const generateAnalysis = async (serviceUUID, sessionIndex=0) => {
 
   const json = JSON.stringify(analysis.state);
 
+  // Convert manifest JS timestamp to Unix timestamp
+  const manifest = analysis.state.manifest;
+  manifest.startTime = Math.floor(manifest.startTime / 1000);
+
   return {
     analysis: json,
-    filename: filenameFromManifest(analysis.state.manifest, 'json')
+    filename: filenameFromManifest(manifest, 'json')
   };
 };
