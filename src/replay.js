@@ -25,6 +25,11 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
     new zip.TextReader(JSON.stringify(manifest))
   );
 
+  let prevState = null;
+  let pendingState = null;
+  let pendingTimestamp = null;
+  let stateCounter = 0;
+
   for (let offset=0; offset <= stateCount; offset += STATES_PAGE_SIZE) {
     // Note: states is implicitly sorted per the `where` clause used in the Dexie query.
     // https://github.com/dexie/Dexie.js/issues/300 would be useful here... but
@@ -34,45 +39,53 @@ export const generateReplay = async (serviceUUID, sessionIndex=0, onProgress) =>
 
     let idx = offset;
 
-    let prevState = null;
-    let prevTime = null;
-    let stateCounter = 0;
-    let prevFrameFailed = false;
-
     for (const { state, timestamp } of statesArray) {
       delete state.manifest;
 
       const timePart = `${Math.floor(timestamp / 1000)}`.padStart(11, '0');
-      // If the new time part is identical to the previous time part (i.e. we had
-      // two frames within a second) then the second should be written as a kframe
-      // to avoid jumping states and having iframes not apply cleanly.
-      const shouldBeIframe = prevFrameFailed ||
-        (!!prevState &&
-          (stateCounter++ % 10) !== 0 &&
-          timePart !== prevTime
-        );
 
-      const filePart = `${shouldBeIframe ? 'i' : ''}.json`;
-      const filename = `${timePart}${filePart}`;
+      if (pendingTimestamp === timePart) {
+        // A newer state within the same second as the previous state; throw
+        // away the older one and add the newer one in its place.
+        pendingState = state;
+      }
+      else if (!!pendingState) {
+        const shouldBeIframe = !!prevState && (stateCounter++ % 10) !== 0;
+        const filePart = `${shouldBeIframe ? 'i' : ''}.json`;
+        const filename = `${timePart}${filePart}`;
 
-      const writableState = shouldBeIframe ? createIframe({ ...prevState }, state) : state;
-      try {
-        await writer.add(
-          filename,
-          new zip.TextReader(JSON.stringify(writableState))
-        );
-        prevFrameFailed = false;
+        const writableState = shouldBeIframe ? createIframe({ ...prevState }, pendingState) : pendingState;
+        try {
+          await writer.add(
+            filename,
+            new zip.TextReader(JSON.stringify(writableState))
+          );
+        }
+        catch (e) {
+          console.warn(e); //eslint-disable-line no-console
+          // Most likely a "file already exists" error from zip.js although we
+          // have made every effort to avoid these
+        }
+        prevState = { ...pendingState };
       }
-      catch {
-        // Most likely a "file already exists" error from zip.js
-        // So long as we make the subsequent frame a keyframe, it's probably fine
-        // to ignore this
-        prevFrameFailed = true;
-      }
+
       onProgress({ item: idx++, total: stateCount, percent: Math.floor(100 * idx / stateCount) });
-      prevState = { ...state };
-      prevTime = timePart;
+      pendingState = { ...state };
+      pendingTimestamp = timePart;
     }
+  }
+
+  const finalFilename = `${pendingTimestamp}.json`;
+  try {
+    await writer.add(
+      finalFilename,
+      new zip.TextReader(JSON.stringify(pendingState))
+    );
+  }
+  catch (e) {
+    console.warn(e); //eslint-disable-line no-console
+    // Most likely a "file already exists" error from zip.js although we
+    // have made every effort to avoid these
   }
 
 
